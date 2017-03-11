@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<ProfilingTarget xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ProjectTarget>
+    <TargetProject>cc3327a3-47ac-4b63-b9b8-c613c47e7de8</TargetProject>
+    <FriendlyName>RetailOpenCV</FriendlyName>
+  </ProjectTarget>
+</ProfilingTarget>

@@ -1,0 +1,11 @@
+
+{
+	"data":
+		[{
+			"person": "eee4064c-93db-4e08-a50e-5d44219beac7", 
+			"enters": -1, 
+			"exits": -1, 
+			"timestamp": "2017-03-10 23:25:52.017657"
+		}], 
+	"camera_id": "test"
+}

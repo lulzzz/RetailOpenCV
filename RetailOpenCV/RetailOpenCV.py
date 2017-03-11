@@ -58,7 +58,7 @@ class SendDataThread(threading.Thread):
     def __init__(self): 
         threading.Thread.__init__(self)
         self._stop = threading.Event()
-        print("Thread initiated")
+        print("Thread initialized")
 
     def run(self):
         while not self.stopped():
@@ -207,13 +207,6 @@ def main():
 
         t = {}
 
-        t['start'] = time.time()
-
-        #Image acquisition
-        ret,frame = VideoSource.next_frame()
-
-        t['next_frame'] = time.time()
-
         #break at the end of the video 
         if not ret:
             print('End of video')
@@ -224,9 +217,21 @@ def main():
             print("Exiting...")
             break   
 
-        #processing
+
+        t['start'] = time.time()
+
+        #new frame acquisition
+        ret,frame = VideoSource.next_frame()
+
+        t['next_frame'] = time.time()
+
+        '''
+        '
+        '   PROCESSING
+        '
+        '''  
         
-        #detect background
+        #Foreground extraction
         forground = fgbg.update(frame, VideoSource.nb_frame)
 
         t['foreground'] = time.time()
@@ -245,6 +250,7 @@ def main():
             #detect contours on the extracted foreground
             temp_recherche_contour = copy(forground)
             contours,hierarchy = cv2.findContours( temp_recherche_contour, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+            
             t['detect_contours'] = time.time()
 
             #init liste that contains the probable persons detected on the frame
@@ -299,15 +305,14 @@ def main():
                     t['update_persons'] = time.time()
                     
         
-                    '''
-                    '
-                    '   DRAWING
-                    '
-                    '
-                    '''       
+            '''
+            '
+            '   DRAWING
+            '
+            '''       
 
             #draw general information and zones
-            frame_annotation_copy = frame_annotation.copy()
+            #frame_annotation_copy = frame_annotation.copy()
             draw_general_infos(VideoSource, frame_annotation, zones)
             
             #draw the detected persons on the frame

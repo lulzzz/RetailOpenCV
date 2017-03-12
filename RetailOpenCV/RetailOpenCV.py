@@ -47,7 +47,7 @@ from multiprocessing import Process, TimeoutError
 
 
 
-input_video = "/Users/Olivier/GitHub/Retail/chute/14/cam8.avi"
+input_video = "/Users/Olivier/GitHub/Retail/chute/01/cam8.avi"
 #input_video = "/Users/Olivier/GitHub/Retail/footage/cafet2.mp4"
 
 
@@ -207,6 +207,12 @@ def main():
 
         t = {}
 
+        t['start'] = time.time()
+
+        #new frame acquisition
+        ret,frame = VideoSource.next_frame()
+
+
         #break at the end of the video 
         if not ret:
             print('End of video')
@@ -218,11 +224,7 @@ def main():
             break   
 
 
-        t['start'] = time.time()
-
-        #new frame acquisition
-        ret,frame = VideoSource.next_frame()
-
+        
         t['next_frame'] = time.time()
 
         '''
@@ -405,13 +407,15 @@ def main():
         #t = float(t)/float(VideoSource.nb_frame)
         print('{}: {}ms'.format(t, (float(tot[t])/VideoSource.nb_frame)*1000))
     
+    print("--------------------------")
 
+    '''
     nb_contours_tot = {'contours':0, 'approx':0}
     for n in  nb_contours:
         nb_contours_tot['contours'] += n['contours']
         nb_contours_tot['approx'] += n['approx']
 
-    '''
+    
     print("--------------------------")
     print("Contours: {}".format(nb_contours_tot['contours'])) 
     print("--------------------------")

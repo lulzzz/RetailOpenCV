@@ -1,0 +1,12 @@
+
+{"data": [{"person": "7c36a29d-f797-49cf-826f-79872d58885d", "enters": -1, "exits": -1, "timestamp": "2017-03-12 19:17:47.116380"}], "camera_id": "test"}
+{"data": [{"person": "7c36a29d-f797-49cf-826f-79872d58885d", "enters": "A", "exits": -1, "timestamp": "2017-03-12 19:17:47.589918"}], "camera_id": "test"}
+{"data": [{"person": "7c36a29d-f797-49cf-826f-79872d58885d", "enters": -1, "exits": "A", "timestamp": "2017-03-12 19:17:49.980039"}], "camera_id": "test"}
+{"data": [{"person": "7c36a29d-f797-49cf-826f-79872d58885d", "enters": "B", "exits": -1, "timestamp": "2017-03-12 19:17:51.562922"}], "camera_id": "test"}
+{"data": [{"person": "7c36a29d-f797-49cf-826f-79872d58885d", "enters": -1, "exits": "B", "timestamp": "2017-03-12 19:17:56.869174"}, {"person": "7c36a29d-f797-49cf-826f-79872d58885d", "enters": "B", "exits": -1, "timestamp": "2017-03-12 19:17:56.951724"}, {"person": "7c36a29d-f797-49cf-826f-79872d58885d", "enters": -1, "exits": "B", "timestamp": "2017-03-12 19:17:57.034027"}], "camera_id": "test"}
+{"data": [{"person": "7c36a29d-f797-49cf-826f-79872d58885d", "enters": "B", "exits": -1, "timestamp": "2017-03-12 19:18:06.876600"}], "camera_id": "test"}
+{"data": [{"person": "7c36a29d-f797-49cf-826f-79872d58885d", "enters": -1, "exits": "B", "timestamp": "2017-03-12 19:18:07.306298"}, {"person": "7c36a29d-f797-49cf-826f-79872d58885d", "enters": "B", "exits": -1, "timestamp": "2017-03-12 19:18:07.554884"}, {"person": "7c36a29d-f797-49cf-826f-79872d58885d", "enters": -1, "exits": "B", "timestamp": "2017-03-12 19:18:07.637214"}, {"person": "7c36a29d-f797-49cf-826f-79872d58885d", "enters": "B", "exits": -1, "timestamp": "2017-03-12 19:18:07.680628"}, {"person": "7c36a29d-f797-49cf-826f-79872d58885d", "enters": -1, "exits": "B", "timestamp": "2017-03-12 19:18:08.201154"}], "camera_id": "test"}
+{"data": [{"person": "7c36a29d-f797-49cf-826f-79872d58885d", "enters": "B", "exits": -1, "timestamp": "2017-03-12 19:18:08.322796"}], "camera_id": "test"}
+{"data": [{"person": "7c36a29d-f797-49cf-826f-79872d58885d", "enters": -1, "exits": "B", "timestamp": "2017-03-12 19:18:12.556379"}, {"person": "7c36a29d-f797-49cf-826f-79872d58885d", "enters": "A", "exits": -1, "timestamp": "2017-03-12 19:18:12.729553"}], "camera_id": "test"}
+{"data": [{"person": "7c36a29d-f797-49cf-826f-79872d58885d", "enters": -1, "exits": "A", "timestamp": "2017-03-12 19:18:13.920827"}], "camera_id": "test"}
+{"data": [{"person": "7c36a29d-f797-49cf-826f-79872d58885d", "enters": "B", "exits": -1, "timestamp": "2017-03-12 19:18:15.345880"}], "camera_id": "test"}

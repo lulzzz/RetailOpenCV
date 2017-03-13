@@ -13,7 +13,6 @@ import json
 import requests
 
 
-
 def xmax(cnt):
     return tuple(cnt[cnt[:,:,0].argmax()][0])[0] 
 
@@ -163,7 +162,7 @@ def update_persons(persons, nb_frame, persons_on_frame):
                     persons[0].update(nb_frame, persons_on_frame[0]) 
         '''
 
-    
+        
     else:
         working_temp_p_on_frame = copy(persons_on_frame)
         for p in persons:
@@ -171,21 +170,26 @@ def update_persons(persons, nb_frame, persons_on_frame):
                 for i,pf in enumerate(working_temp_p_on_frame):
                     if bbox_overlap(bbox(pf), bbox(p.liste_contours[-1][1])):
                         p.update(nb_frame, pf)
-                        #TODO ca pete ici
-                        #persons_on_frame.remove(pf)
                         working_temp_p_on_frame.pop(i)
         for pf in working_temp_p_on_frame:
             persons.append(Person(nb_frame, pf))
 
+    
 
-'''
+
 def check_for_deaths(persons, new_size):
     for p in persons:
+
+        if nb_frame - p.age > cf.NO_SEE_FRAMES_BEFORE_DEATH:
+            p.alive = False
+
         if p.close_from_borders(VideoSource.new_size):
-'''     
+            if nb_frame - p.age > 100:
+                p.alive = False
 
 
-def update_persons_zones( persons, nb_frame, zones):
+
+def update_persons_zones(persons, nb_frame, zones):
 
     for p in persons:
 

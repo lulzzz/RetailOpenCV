@@ -17,7 +17,7 @@ class Person(object):
         self.time = time.time()
         self.liste_contours = [(nb_frame, liste_contours, self.time)]
        
-        self.age = 0
+        self.age = 1
 
         M = cv2.moments(liste_contours[0])
         cx = int(M['m10']/M['m00'])

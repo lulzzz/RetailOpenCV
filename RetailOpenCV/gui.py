@@ -12,5 +12,10 @@ from Tkinter import *
 
 
 root = Tk()
-root.title("Retail motion detection")
+
+
+
+
+
+root.title("Tracking")
 

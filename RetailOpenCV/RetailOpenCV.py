@@ -206,9 +206,9 @@ def main():
     #main loop
     while (True):
 
-        t = {}
+        #t = {}
 
-        t['start'] = time.time()
+        #t['start'] = time.time()
 
         #new frame acquisition
         ret,frame = VideoSource.next_frame()
@@ -226,7 +226,7 @@ def main():
 
 
         
-        t['next_frame'] = time.time()
+        #t['next_frame'] = time.time()
 
         '''
         '
@@ -237,13 +237,13 @@ def main():
         #Foreground extraction
         forground = fgbg.update(frame, VideoSource.nb_frame)
 
-        t['foreground'] = time.time()
+        #t['foreground'] = time.time()
         
         #prepare the frame to be displayed
         frame_annotation = VideoSource.frame_with_annotation()
 
         
-        t['annotations'] = time.time()
+        #['annotations'] = time.time()
 
         #wait TRAIN_FRAMES frames to train the background
         if (VideoSource.nb_frame > cf.TRAIN_FRAMES):
@@ -254,7 +254,7 @@ def main():
             temp_recherche_contour = copy(forground)
             contours,hierarchy = cv2.findContours( temp_recherche_contour, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
             
-            t['detect_contours'] = time.time()
+            #t['detect_contours'] = time.time()
 
             #init liste that contains the probable persons detected on the frame
             temp_persons_detected_on_current_frame = []
@@ -277,20 +277,20 @@ def main():
 
                 cnt_approx = contours
 
-                t['contours_approx'] = time.time()
+                #t['contours_approx'] = time.time()
 
 
                 #only keep the bigger contours (for noise removal)
                 contours = [c for c in cnt_approx if cv2.contourArea(c)>cf.CNT_MIN]
 
-                t['contours_sort'] = time.time()
+                #t['contours_sort'] = time.time()
 
                 #if there are still some contours big enough present on the frame
                 if len(contours) > 0:
 
                     contours.sort(tl.compare_contour_aera)
 
-                    t['contours_size_sort'] = time.time()
+                    #t['contours_size_sort'] = time.time()
 
                     #try to detect groups on contours that could be persons on the frame
                     previous_len_cnt = 0                    
@@ -300,16 +300,16 @@ def main():
                             temp_persons_detected_on_current_frame.append(l)
                         previous_len_cnt = len(contours)
 
-                    t['search_persons'] = time.time()
+                    #t['search_persons'] = time.time()
 
                     #when possible persons are identified on the frame, try to track them, ie associate these persons with the ones already registered
                     tl.update_persons(persons, VideoSource.nb_frame, temp_persons_detected_on_current_frame)
 
-                    t['update_persons'] = time.time()
+                    #t['update_persons'] = time.time()
 
                     tl.update_persons_zones(persons, VideoSource.nb_frame, zones)
 
-                    t['update_zones'] = time.time()
+                    #t['update_zones'] = time.time()
                     
         
             '''
@@ -335,7 +335,7 @@ def main():
                 
 
                 #cv2.addWeighted(overlay, cf.ALPHA, frame_annotation, 1 - cf.ALPHA, 0, frame_annotation)
-            t['draw'] = time.time()
+            #t['draw'] = time.time()
 
 
 
@@ -346,7 +346,7 @@ def main():
 
         #print("FRAME "+str(VideoSource.nb_frame)+" "+str(round(VideoSource.nb_frame/(time.time()-cf.T_START)))+" FPS")  
         
-        timer.append(t)         
+        #timer.append(t)         
 
     #release the camera and close opencv windows
     VideoSource.release()
@@ -370,7 +370,7 @@ def main():
         data.get('persons').append(temp)
         '''
         #print(str(p.uuid)+ ": "+ str(len(p.liste_positions)) +" positions detected")
-        print("{}: {} positions".format(p.uuid, len(p.liste_positions)))
+        print("{}: age {}".format(p.uuid, p.age))
     
     print("--------------------------")
     print("Zones")
@@ -378,9 +378,13 @@ def main():
     for m in zones.masks:
         print("{}: {} entries, {} exists".format(m[0].title(), zones.count["entries"][m[0]], zones.count["exits"][m[0]]))
 
+    
+    
+    print("--------------------------")
+
+    '''
 
     t_end = time.time()
-    print("--------------------------")
     print("{} Frames".format(VideoSource.nb_frame))
     print("{} s".format(round(t_end - cf.T_START, 2)))
     print("{} AVG FPS".format(float(VideoSource.nb_frame)/(time.time()-cf.T_START)))
@@ -425,7 +429,7 @@ def main():
         print('{}: {}ms'.format(t, (float(tot[t])/VideoSource.nb_frame)*1000))
     
     print("--------------------------")
-
+    '''
 
 
     '''

@@ -88,9 +88,12 @@ MAX_PERS_SIZE_Y = 300
 MIN_PERS_SIZE_X = 40
 MIN_PERS_SIZE_Y = 80
 
+#FRAME LIMITS (KILLING ZONE)
 
+DEAD_ZONE_Y = 50
+DEAD_ZONE_X = 30
 
 ALPHA = 0.5
 
 
-DIR_ZONES = "/Users/Olivier/GitHub/Retail/chute/zones"
+DIR_ZONES = "C:\\Users\\Olivier Staub\\Documents\\videoset\\zones"

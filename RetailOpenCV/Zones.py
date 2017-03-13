@@ -24,6 +24,8 @@ class Zones(object):
 
         self.masks = []
 
+        self.count = {"entries":{}, "exits":{}}
+
         for file in os.listdir(video_dir):
 
             if file.startswith(video_file):
@@ -46,11 +48,14 @@ class Zones(object):
 
                     contours,hierarchy = cv2.findContours(img_bw, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
                     couleur = tl.random_color()
+                    #(name of the zone, liste of contours defining the zone, color of the zone on the frame)
                     self.masks.append((zone_name, contours, couleur))
-
+                    self.count["entries"][zone_name] = 0
+                    self.count["exits"][zone_name] = 0
 
     def nb_zones(self):
         return len(self.masks)
+
 
     def in_zones(self, position):
         for m in self.masks:
@@ -58,4 +63,12 @@ class Zones(object):
                 if (cv2.pointPolygonTest(cnt, position, False)==True):
                     return m[0]
         return -1
-    
+
+
+    def inc_in(self, zone_name):
+        self.count["entries"][zone_name] += 1
+        
+
+
+    def inc_out(self, zone_name):
+        self.count["exits"][zone_name] += 1

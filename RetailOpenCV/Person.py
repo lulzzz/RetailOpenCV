@@ -13,7 +13,7 @@ class Person(object):
 
 
 
-    def __init__(self, nb_frame, liste_contours, zones):
+    def __init__(self, nb_frame, liste_contours):
         self.time = time.time()
         self.liste_contours = [(nb_frame, liste_contours, self.time)]
        
@@ -26,18 +26,23 @@ class Person(object):
 
         self.couleur, self.couleur_dark = tl.random_color()
 
-        self.liste_positions = [self.position_last_frame(nb_frame)]
+        self.liste_positions = [(self.position_last_frame(nb_frame), nb_frame)]
 
         self.uuid = uuid.uuid4()
 
-        self.zone = zones.in_zones(self.position_last_frame(nb_frame))
+        self.liste_zones = []
 
-        cf.to_be_sent.append((str(self.uuid), self.zone, self.zone, tl.time()))
-        print('{} {} appears in zone: {}'.format(tl.time(), str(self.uuid), self.zone))
-
+        self.alive = True
 
 
-    def update(self, nb_frame, liste_contours, zones):
+        #self.zone = zones.in_zones(self.position_last_frame(nb_frame))
+
+        #cf.to_be_sent.append((str(self.uuid), self.zone, self.zone, tl.time()))
+        #print('{} {} appears in zone: {}'.format(tl.time(), str(self.uuid), self.zone))
+
+
+
+    def update(self, nb_frame, liste_contours):
         t = time.time()
         self.liste_contours.append((nb_frame, liste_contours, t))
 
@@ -50,12 +55,12 @@ class Person(object):
     
         last_frame_position = self.position_last_frame(nb_frame)
 
-        self.liste_positions.append(last_frame_position)
+        self.liste_positions.append((last_frame_position, nb_frame))
 
-        new_zone = zones.in_zones(self.position_last_frame(nb_frame))
+        #new_zone = zones.in_zones(self.position_last_frame(nb_frame))
 
         #cf.to_be_sent.append((str(self.uuid), last_frame_position[0], last_frame_position[1], tl.time()))
-
+        '''
         if (self.zone != new_zone):
             if (self.zone == -1):
                 print("{} {} enters zone: {}".format(tl.time(), str(self.uuid), new_zone))
@@ -63,10 +68,12 @@ class Person(object):
                 print("{} {} exits zone: {}".format(tl.time(), str(self.uuid), self.zone))
 
             cf.to_be_sent.append((str(self.uuid), self.zone, new_zone, tl.time()))
-
+        
 
         self.zone = new_zone
+        '''
 
+        #self.liste_zones.append((0, nb_frame))
 
     def position_last_frame(self, nb_frame):
         (bbx,bby,bbw,bbh) = self.bbox_last_frame(nb_frame)
@@ -112,10 +119,25 @@ class Person(object):
         else:
             return False
 
-    def zone_last_frame(self, nb_frame):
-        if (self.liste_contours[-1][0] == nb_frame):
-            return "zones"
+
+    def last_zone(self):
+        if len(self.liste_zones)==0:
+            return 0
+        else:
+            return self.liste_zones[-1][0] 
+
+
+    def add_zone(self, zone, nb_frame):
+        self.liste_zones.append((zone, nb_frame))
         
+    def close_from_borders(self,  video_dim):
+        x, y  = self.liste_positions[-1][0]
+        w, h = int(video_dim)
+        if (x < cf.DEAD_ZONE_X) | (x > (w - cf.DEAD_ZONE_X)):
+            return True            
+        if (y < cf.DEAD_ZONE_Y) | (y > (h - cf.DEAD_ZONE_Y)):
+            return True
+        return False
 
     '''
     def position(self, nb_frame):

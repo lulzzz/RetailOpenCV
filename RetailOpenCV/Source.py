@@ -4,6 +4,7 @@ import config as cf
 import random
 from datetime import datetime
 import time
+from copy import copy
 
 class Source(object):
 
@@ -46,20 +47,17 @@ class Source(object):
 
     def frame_with_annotation(self):
         lignes = []
-
+        temp = copy(self.current_frame)
+        
         if self.display_frame_dim:
             lignes.append(str(int(self.new_size[0]))+"x"+str(int(self.new_size[1])))
 
         if self.display_frame_number:
             lignes.append("Frame " + str(self.nb_frame))
-          
         lignes.append("FPS "+str(round(self.nb_frame/(time.time()-cf.T_START),2)))
-
-        temp = self.current_frame  
         for ligne in enumerate(lignes):
             cv2.putText(temp,ligne[1],(0,12*(ligne[0]+1)+3*ligne[0]), cf.FONT, 0.5,cf.ANOTATION_COLOR,1)
-
-
+        
         return temp
         
     def video_dim(self):

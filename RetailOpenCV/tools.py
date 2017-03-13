@@ -152,31 +152,91 @@ def search_person_on_frame(contours):
         return 0,[]
 
 
-def update_persons(persons, nb_frame, persons_on_frame, zones):
+def update_persons(persons, nb_frame, persons_on_frame):
     
     if len(persons) == 0:
         for pf in persons_on_frame:
-            persons.append(Person(nb_frame, pf, zones))
-        
-    else:
-        if len(persons_on_frame) > 0:
-            persons[0].update(nb_frame, persons_on_frame[0], zones) 
+            persons.append(Person(nb_frame, pf))
+        '''
+        else:
+                if len(persons_on_frame) > 0:
+                    persons[0].update(nb_frame, persons_on_frame[0]) 
+        '''
 
-        
-    '''
-    else:
-        for p in persons:
-            for i,pf in enumerate(persons_on_frame):
-                if bbox_overlap(bbox(pf), bbox(p.liste_contours[-1][1])):
-                    p.update(nb_frame, pf, zones)
-                    #TODO ca pete ici
-                    #persons_on_frame.remove(pf)
-                    persons_on_frame.pop(i)
-        for pf in persons_on_frame:
-            persons.append(Person(nb_frame, pf, zones))
-    '''
     
+    else:
+        working_temp_p_on_frame = copy(persons_on_frame)
+        for p in persons:
+            if p.alive:
+                for i,pf in enumerate(working_temp_p_on_frame):
+                    if bbox_overlap(bbox(pf), bbox(p.liste_contours[-1][1])):
+                        p.update(nb_frame, pf)
+                        #TODO ca pete ici
+                        #persons_on_frame.remove(pf)
+                        working_temp_p_on_frame.pop(i)
+        for pf in working_temp_p_on_frame:
+            persons.append(Person(nb_frame, pf))
 
+
+'''
+def check_for_deaths(persons, new_size):
+    for p in persons:
+        if p.close_from_borders(VideoSource.new_size):
+'''     
+
+
+def update_persons_zones( persons, nb_frame, zones):
+
+    for p in persons:
+
+        if p.exists_at_last_frame(nb_frame):
+
+            previous_zone = p.last_zone()
+
+            new_zone = zones.in_zones(p.position_last_frame(nb_frame))
+
+            if previous_zone == 0:
+                p.add_zone(new_zone, nb_frame)
+                cf.to_be_sent.append((str(p.uuid), previous_zone, new_zone, time()))
+                print('{} {} appears in zone: {}'.format(time(), str(p.uuid), new_zone))
+                if (new_zone != -1):
+                    zones.inc_in(new_zone)
+
+            else:
+                if previous_zone == new_zone:
+                    p.add_zone(new_zone, nb_frame)
+
+                else:
+                    if (previous_zone == -1):
+                        print('{} {} enters zone: {}'.format(time(), str(p.uuid), new_zone))
+                        zones.inc_in(new_zone)
+
+                    elif (new_zone == -1):
+                        print('{} {} exits zone: {}'.format(time(), str(p.uuid), previous_zone))
+                        zones.inc_out(previous_zone)
+
+                    else:
+                        print('{} {} exits zone: {} and enters zone: {}'.format(time(), str(p.uuid), previous_zone, new_zone))
+                        zones.inc_out(previous_zone)
+                        zones.inc_in(new_zone)
+
+
+                    p.add_zone(new_zone, nb_frame)
+                    cf.to_be_sent.append((str(p.uuid), previous_zone, new_zone, time()))
+                
+                
+
+        #cf.to_be_sent.append((str(self.uuid), last_frame_position[0], last_frame_position[1], tl.time()))
+        '''
+        if (self.zone != new_zone):
+            if (self.zone == -1):
+                print("{} {} enters zone: {}".format(tl.time(), str(self.uuid), new_zone))
+            elif(new_zone == -1):
+                print("{} {} exits zone: {}".format(tl.time(), str(self.uuid), self.zone))
+
+            cf.to_be_sent.append((str(self.uuid), self.zone, new_zone, tl.time()))
+        self.zone = new_zone
+        '''
 
 def hsv_to_bgr(h,s,v):
     c = v * s

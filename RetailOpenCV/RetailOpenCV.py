@@ -22,7 +22,7 @@ import os
 from multiprocessing import Process, TimeoutError
 
 
-#input_video = "C:\\Users\\Olivier Staub\\Documents\\ComputerVision_Detect_Body\\videoset\\chute23\\cam2.avi"
+input_video = "C:\\Users\\Olivier Staub\\Documents\\videoset\\chute16\\cam2.avi"
 
 #input_video = "C:\\Users\\Olivier Staub\\Documents\\ComputerVision_Detect_Body\\videoset\\chute16\\cam2.avi"
 
@@ -47,7 +47,7 @@ from multiprocessing import Process, TimeoutError
 
 
 
-input_video = "/Users/Olivier/GitHub/Retail/chute/01/cam8.avi"
+#input_video = "/Users/Olivier/GitHub/Retail/chute/01/cam8.avi"
 #input_video = "/Users/Olivier/GitHub/Retail/footage/cafet2.mp4"
 
 
@@ -118,25 +118,26 @@ def draw_general_infos(VideoSource, frame_annotation, zones):
     cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-8), (cf.MAX_PERS_SIZE_X, int(VideoSource.new_size[1])-8), (0,255,0),2)
     cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-12), (cf.MAX_DIST_CENTER_X, int(VideoSource.new_size[1])-12), (255,0,0), 2)
             
+    #recording dot
     cv2.circle(frame_annotation, (int(VideoSource.new_size[0])-16, 15), 6, (0,255,0), -1)
 
-    #draw the detection zones on the frame
+    #dead zones
+    cv2.line(frame_annotation, ( cf.DEAD_ZONE_X, 0), (cf.DEAD_ZONE_X, int(VideoSource.new_size[1])), (255,255, 0), 1)
+    cv2.line(frame_annotation, ( int(VideoSource.new_size[0]) - cf.DEAD_ZONE_X, 0), ( int(VideoSource.new_size[0]) - cf.DEAD_ZONE_X, int(VideoSource.new_size[1])), (255,255, 0), 1)
+    cv2.line(frame_annotation, (0, cf.DEAD_ZONE_Y), (int(VideoSource.new_size[0]), cf.DEAD_ZONE_Y), (255, 255, 0), 1)
+    cv2.line(frame_annotation, (0, int(VideoSource.new_size[1]) - cf.DEAD_ZONE_Y), (int(VideoSource.new_size[0]), int(VideoSource.new_size[1]) - cf.DEAD_ZONE_Y), (255, 255, 0), 1)
 
+
+def draw_zones(zones, frame_annotation):
     if zones.nb_zones() > 0:
-                        
-        #overlay = np.ones((VideoSource.new_size[1], VideoSource.new_size[0], 3), dtype=np.uint8)
-
         overlay = frame_annotation.copy()
         for m in zones.masks:
-            
             cv2.drawContours(overlay, m[1], 0, m[2][1], -1)
             (x, y, w, h) = tl.bbox(m[1])                    
             section_overlay = overlay[y:y+h, x:x+w] 
             section_frame_annotation = frame_annotation[y:y+h, x:x+w]
             cv2.addWeighted(section_overlay, 0.15, section_frame_annotation, 1 - 0.15, 0, section_frame_annotation)
             frame_annotation[y:y+h, x:x+w] = section_frame_annotation
-            
-
             cv2.drawContours(frame_annotation, m[1], 0, m[2][1], 2)
 
 
@@ -302,9 +303,13 @@ def main():
                     t['search_persons'] = time.time()
 
                     #when possible persons are identified on the frame, try to track them, ie associate these persons with the ones already registered
-                    tl.update_persons(persons, VideoSource.nb_frame, temp_persons_detected_on_current_frame, zones)
+                    tl.update_persons(persons, VideoSource.nb_frame, temp_persons_detected_on_current_frame)
 
                     t['update_persons'] = time.time()
+
+                    tl.update_persons_zones(persons, VideoSource.nb_frame, zones)
+
+                    t['update_zones'] = time.time()
                     
         
             '''
@@ -313,10 +318,13 @@ def main():
             '
             '''       
 
-            #draw general information and zones
+            #draw general information
             #frame_annotation_copy = frame_annotation.copy()
             draw_general_infos(VideoSource, frame_annotation, zones)
             
+            #draw detection zone on the frame
+            draw_zones(zones, frame_annotation)
+
             #draw the detected persons on the frame
             draw_persons(persons, VideoSource, frame_annotation, frame_annotation)
                            
@@ -364,6 +372,13 @@ def main():
         #print(str(p.uuid)+ ": "+ str(len(p.liste_positions)) +" positions detected")
         print("{}: {} positions".format(p.uuid, len(p.liste_positions)))
     
+    print("--------------------------")
+    print("Zones")
+    
+    for m in zones.masks:
+        print("{}: {} entries, {} exists".format(m[0].title(), zones.count["entries"][m[0]], zones.count["exits"][m[0]]))
+
+
     t_end = time.time()
     print("--------------------------")
     print("{} Frames".format(VideoSource.nb_frame))
@@ -381,6 +396,7 @@ def main():
     tot['contours_size_sort'] = 0
     tot['search_persons'] = 0
     tot['update_persons'] = 0
+    tot['update_zones'] = 0
     tot['draw'] = 0
 
     for t in timer:
@@ -399,15 +415,18 @@ def main():
                             tot['search_persons'] += t['search_persons'] - t['contours_size_sort']
                             if 'update_persons' in t:
                                 tot['update_persons'] += t['update_persons'] - t['search_persons']
-                                if 'draw' in t:
-                                    tot['draw'] += t['draw'] - t['update_persons']
+                                if 'update_zones' in t:
+                                    tot['update_zones'] += t['update_zones'] - t['update_persons']
+                                    if 'draw' in t:
+                                        tot['draw'] += t['draw'] - t['update_zones']
         
-
     for t in tot:
         #t = float(t)/float(VideoSource.nb_frame)
         print('{}: {}ms'.format(t, (float(tot[t])/VideoSource.nb_frame)*1000))
     
     print("--------------------------")
+
+
 
     '''
     nb_contours_tot = {'contours':0, 'approx':0}

@@ -21,7 +21,26 @@ class Source(object):
 
         self.camera = cv2.VideoCapture(path)
         self.original_size = self.camera.get(3), self.camera.get(4) 
+
+        print("Original size: {} x {}".format(self.camera.get(3), self.camera.get(4)))
+
+        if (path == 0):
+            self.camera.set(3, 640)
+            self.camera.set(4, 480)
+
+        if (path == 1):
+            self.camera.set(3, 640)
+            self.camera.set(4, 360)
+            
+        self.original_size = self.camera.get(3), self.camera.get(4)
+
+        print("Ajusted size: {} x {}".format(self.camera.get(3), self.camera.get(4)))
+
+
         self.new_size = self.video_dim()
+
+        print("New size: {} x {}".format(self.new_size[0], self.new_size[1]))
+
         cf.CURRENT_FRAME_SIZE = self.new_size
         self.current_frame = np.zeros((int(self.video_dim()[0]), int(self.video_dim()[1])), dtype=np.uint8)
       
@@ -67,7 +86,7 @@ class Source(object):
             height = int(cf.MAX_LONGER_SIDE * height / width)
             width = cf.MAX_LONGER_SIDE
 
-        if (height>width) & (height>cf.MAX_LONGER_SIDE):
+        if (height > width) & (height>cf.MAX_LONGER_SIDE):
             width = int(cf.MAX_LONGER_SIDE  * width / height)
             height = cf.MAX_LONGER_SIDE
 

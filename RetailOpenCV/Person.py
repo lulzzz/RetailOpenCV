@@ -18,6 +18,7 @@ class Person(object):
         self.liste_contours = [(nb_frame, liste_contours, self.time)]
        
         self.age = 1
+        self.last_frame_seen = nb_frame
 
         M = cv2.moments(liste_contours[0])
         cx = int(M['m10']/M['m00'])
@@ -28,7 +29,7 @@ class Person(object):
 
         self.liste_positions = [(self.position_last_frame(nb_frame), nb_frame)]
 
-        self.uuid = uuid.uuid4()
+        self.uuid = str(uuid.uuid4())[0:6]
 
         self.liste_zones = []
 
@@ -47,6 +48,7 @@ class Person(object):
         self.liste_contours.append((nb_frame, liste_contours, t))
 
         self.age += 1
+        self.last_frame_seen = nb_frame
 
         M = cv2.moments(liste_contours[0])
         cx = int(M['m10']/M['m00'])
@@ -132,7 +134,7 @@ class Person(object):
         
     def close_from_borders(self,  video_dim):
         x, y  = self.liste_positions[-1][0]
-        w, h = int(video_dim)
+        w, h = int(video_dim[0]), int(video_dim[1])
         if (x < cf.DEAD_ZONE_X) | (x > (w - cf.DEAD_ZONE_X)):
             return True            
         if (y < cf.DEAD_ZONE_Y) | (y > (h - cf.DEAD_ZONE_Y)):

@@ -91,50 +91,50 @@ def search_person_on_frame(contours):
        
     res_temp = []
         
-    if cv2.contourArea(contours[0]) > cf.MIN_SIZE_CNT:
+    #if cv2.contourArea(contours[0]) > cf.MIN_SIZE_CNT:
         
-        ref = copy(contours[0])
+    ref = copy(contours[0])
 
-        temp = copy(contours)
-        contours.remove(contours[0])
-        cnt_approx = []
+    temp = copy(contours)
+    contours.remove(contours[0])
+    cnt_approx = []
                            
-        #get biggest area detected
-        centre_ref = center_contour(ref)
+    #get biggest area detected
+    centre_ref = center_contour(ref)
                             
-        res_temp.append(ref)
+    res_temp.append(ref)
 
-        for i,c in enumerate(temp):
-            if i != 0:
-                #calcul distance between the biggest area and the others
-                centre_c = center_contour(c)
+    for i,c in enumerate(temp):
+        if i != 0:
+            #calcul distance between the biggest area and the others
+            centre_c = center_contour(c)
                         
-                #dist = distance(centre_ref, centre_c)
-                dist_x = abs(centre_ref[0] - centre_c[0])
-                dist_y = abs(centre_ref[1] - centre_c[1])
+            #dist = distance(centre_ref, centre_c)
+            dist_x = abs(centre_ref[0] - centre_c[0])
+            dist_y = abs(centre_ref[1] - centre_c[1])
 
-                #check whether the contour is far from the biggest detected
-                if (dist_x < cf.MAX_DIST_CENTER_X) & (dist_y < cf.MAX_DIST_CENTER_Y):
+            #check whether the contour is far from the biggest detected
+            if (dist_x < cf.MAX_DIST_CENTER_X) & (dist_y < cf.MAX_DIST_CENTER_Y):
 
-                    #check whether adding this contour would create a too big overall area for it to be a person
-                    minx_temp = min(min([xmin(cnt) for cnt in res_temp]), xmin(c))
-                    maxx_temp = max(max([xmax(cnt) for cnt in res_temp]), xmax(c))
-                    width = maxx_temp - minx_temp
+                #check whether adding this contour would create a too big overall area for it to be a person
+                minx_temp = min(min([xmin(cnt) for cnt in res_temp]), xmin(c))
+                maxx_temp = max(max([xmax(cnt) for cnt in res_temp]), xmax(c))
+                width = maxx_temp - minx_temp
 
-                    miny_temp = min(min([ymin(cnt) for cnt in res_temp]), ymin(c))
-                    maxy_temp = max(max([ymax(cnt) for cnt in res_temp]), ymax(c))
-                    height = maxy_temp - miny_temp
+                miny_temp = min(min([ymin(cnt) for cnt in res_temp]), ymin(c))
+                maxy_temp = max(max([ymax(cnt) for cnt in res_temp]), ymax(c))
+                height = maxy_temp - miny_temp
 
-                    if (width > cf.MIN_PERS_SIZE_X) & (width < cf.MAX_PERS_SIZE_X):
-                        if (height > cf.MIN_PERS_SIZE_Y) & (height < cf.MAX_PERS_SIZE_Y):
-                            #if no consider the contour as part of the person
-                            res_temp.append(copy(c))
+                if (width > cf.MIN_PERS_SIZE_X) & (width < cf.MAX_PERS_SIZE_X):
+                    if (height > cf.MIN_PERS_SIZE_Y) & (height < cf.MAX_PERS_SIZE_Y):
+                        #if no consider the contour as part of the person
+                        res_temp.append(copy(c))
 
-                            for j,cnt in enumerate(contours):
-                                if len(cnt) == len(c):
-                                    if (cnt == c).all():            
-                                        contours.pop(j)
-                                        break
+                        for j,cnt in enumerate(contours):
+                            if len(cnt) == len(c):
+                                if (cnt == c).all():            
+                                    contours.pop(j)
+                                    break
     
     
     x_min = min([xmin(c) for c in res_temp])
@@ -145,10 +145,14 @@ def search_person_on_frame(contours):
     xw = x_max - x_min
     yh = y_max - y_min
 
-    if (xw > cf.MIN_PERS_SIZE_X)&(yh > cf.MIN_PERS_SIZE_Y):
-        return 1,res_temp
+    sum_area = 0
+    for c in res_temp:
+        sum_area += cv2.contourArea(c)
+
+    if (xw > cf.MIN_PERS_SIZE_X) & (xw < cf.MAX_PERS_SIZE_X) & (yh < cf.MAX_PERS_SIZE_Y) & (yh > cf.MIN_PERS_SIZE_Y) & (sum_area > cf.MIN_SIZE_CNT_PERS):
+        return True,res_temp
     else:
-        return 0,[]
+        return False,[]
 
 
 def update_persons(persons, nb_frame, persons_on_frame):
@@ -177,15 +181,15 @@ def update_persons(persons, nb_frame, persons_on_frame):
     
 
 
-def check_for_deaths(persons, new_size):
+def check_for_deaths(persons, new_size, nb_frame):
     for p in persons:
-
-        if nb_frame - p.age > cf.NO_SEE_FRAMES_BEFORE_DEATH:
-            p.alive = False
-
-        if p.close_from_borders(VideoSource.new_size):
-            if nb_frame - p.age > 100:
+        if p.alive:
+            if nb_frame - p.last_frame_seen > cf.NO_SEE_FRAMES_BEFORE_DEATH:
                 p.alive = False
+                print("{} {} {} dies in zone: {} age: {}".format(nb_frame, time(), str(p.uuid), p.last_zone(), p.age))
+            if p.close_from_borders(new_size) & (( nb_frame - p.last_frame_seen) > 100):
+                p.alive = False
+                print("{} {} {} dies in zone: {} age: ".format(nb_frame, time(), str(p.uuid), p.last_zone(), p.age))
 
 
 
@@ -193,7 +197,7 @@ def update_persons_zones(persons, nb_frame, zones):
 
     for p in persons:
 
-        if p.exists_at_last_frame(nb_frame):
+        if p.exists_at_last_frame(nb_frame) & p.alive:
 
             previous_zone = p.last_zone()
 
@@ -202,7 +206,7 @@ def update_persons_zones(persons, nb_frame, zones):
             if previous_zone == 0:
                 p.add_zone(new_zone, nb_frame)
                 cf.to_be_sent.append((str(p.uuid), previous_zone, new_zone, time()))
-                print('{} {} appears in zone: {}'.format(time(), str(p.uuid), new_zone))
+                print('{} {} {} appears in zone: {}'.format(nb_frame, time(), str(p.uuid), new_zone))
                 if (new_zone != -1):
                     zones.inc_in(new_zone)
 
@@ -212,15 +216,15 @@ def update_persons_zones(persons, nb_frame, zones):
 
                 else:
                     if (previous_zone == -1):
-                        print('{} {} enters zone: {}'.format(time(), str(p.uuid), new_zone))
+                        print('{} {} {} enters zone: {}'.format(nb_frame, time(), str(p.uuid), new_zone))
                         zones.inc_in(new_zone)
 
                     elif (new_zone == -1):
-                        print('{} {} exits zone: {}'.format(time(), str(p.uuid), previous_zone))
+                        print('{} {} {} exits zone: {}'.format(nb_frame, time(), str(p.uuid), previous_zone))
                         zones.inc_out(previous_zone)
 
                     else:
-                        print('{} {} exits zone: {} and enters zone: {}'.format(time(), str(p.uuid), previous_zone, new_zone))
+                        print('{} {} {} exits zone: {} and enters zone: {}'.format(nb_frame, time(), str(p.uuid), previous_zone, new_zone))
                         zones.inc_out(previous_zone)
                         zones.inc_in(new_zone)
 

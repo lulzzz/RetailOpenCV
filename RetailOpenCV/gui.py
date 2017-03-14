@@ -19,3 +19,7 @@ root = Tk()
 
 root.title("Tracking")
 
+
+
+
+root.mainloop()

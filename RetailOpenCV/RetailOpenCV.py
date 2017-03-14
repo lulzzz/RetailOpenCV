@@ -22,11 +22,11 @@ import os
 from multiprocessing import Process, TimeoutError
 
 
-input_video = "C:\\Users\\Olivier Staub\\Documents\\videoset\\chute16\\cam2.avi"
+input_video = "C:\\Users\\Olivier Staub\\Documents\\videoset\\chute16\\cam1.avi"
 
 #input_video = "C:\\Users\\Olivier Staub\\Documents\\ComputerVision_Detect_Body\\videoset\\chute16\\cam2.avi"
 
-#input_video = 0
+#input_video = 1
 
 #input_video = "C:\\Users\\Olivier Staub\\Documents\\footage\\ex1.mp4"
 #input_video = "C:\\Users\\Olivier Staub\\Documents\\footage\\cafet.MOV"
@@ -49,8 +49,6 @@ input_video = "C:\\Users\\Olivier Staub\\Documents\\videoset\\chute16\\cam2.avi"
 
 #input_video = "/Users/Olivier/GitHub/Retail/chute/01/cam8.avi"
 #input_video = "/Users/Olivier/GitHub/Retail/footage/cafet2.mp4"
-
-
 
 
 
@@ -110,6 +108,7 @@ class SendDataThread(threading.Thread):
 
 def draw_general_infos(VideoSource, frame_annotation, zones):
     #show config distance and size at the bottom of the frame
+    
     cv2.line(frame_annotation, (4, int(VideoSource.new_size[1])), (4, int(VideoSource.new_size[1])-cf.MIN_PERS_SIZE_Y),  (0,0,255),2)
     cv2.line(frame_annotation, (8, int(VideoSource.new_size[1])), (8, int(VideoSource.new_size[1])-cf.MAX_PERS_SIZE_Y), (0,255,0),2)
     cv2.line(frame_annotation, (12, int(VideoSource.new_size[1])), (12, int(VideoSource.new_size[1])-cf.MAX_DIST_CENTER_Y), (255,0,0), 2)
@@ -117,15 +116,18 @@ def draw_general_infos(VideoSource, frame_annotation, zones):
     cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-4), (cf.MIN_PERS_SIZE_X, int(VideoSource.new_size[1])-4), (0,0,255),2)
     cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-8), (cf.MAX_PERS_SIZE_X, int(VideoSource.new_size[1])-8), (0,255,0),2)
     cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-12), (cf.MAX_DIST_CENTER_X, int(VideoSource.new_size[1])-12), (255,0,0), 2)
-            
+           
+     
     #recording dot
     cv2.circle(frame_annotation, (int(VideoSource.new_size[0])-16, 15), 6, (0,255,0), -1)
 
     #dead zones
+    
     cv2.line(frame_annotation, ( cf.DEAD_ZONE_X, 0), (cf.DEAD_ZONE_X, int(VideoSource.new_size[1])), (255,255, 0), 1)
     cv2.line(frame_annotation, ( int(VideoSource.new_size[0]) - cf.DEAD_ZONE_X, 0), ( int(VideoSource.new_size[0]) - cf.DEAD_ZONE_X, int(VideoSource.new_size[1])), (255,255, 0), 1)
     cv2.line(frame_annotation, (0, cf.DEAD_ZONE_Y), (int(VideoSource.new_size[0]), cf.DEAD_ZONE_Y), (255, 255, 0), 1)
     cv2.line(frame_annotation, (0, int(VideoSource.new_size[1]) - cf.DEAD_ZONE_Y), (int(VideoSource.new_size[0]), int(VideoSource.new_size[1]) - cf.DEAD_ZONE_Y), (255, 255, 0), 1)
+    
 
 
 def draw_zones(zones, frame_annotation):
@@ -144,7 +146,8 @@ def draw_zones(zones, frame_annotation):
 def draw_persons(persons, VideoSource, frame_annotation, frame_annotation_copy):
             
     #check among the persons we have registered, which are currently on the frame so we can draw informations about them
-    persons_to_draw = [p for p in persons if p.exists_at_last_frame(VideoSource.nb_frame)]
+    
+    persons_to_draw = [p for p in persons if p.exists_at_last_frame(VideoSource.nb_frame) & p.alive]
 
     if len(persons_to_draw) > 0:
                                                 
@@ -180,7 +183,7 @@ def main():
     #video source
     VideoSource = Source(input_video)
 
-    if(input_video==0):
+    if(input_video==0)|(input_video==1):
         print("Source: Webcam")
     else:
         print("Source: {}".format(os.path.basename(input_video)))
@@ -249,7 +252,8 @@ def main():
         if (VideoSource.nb_frame > cf.TRAIN_FRAMES):
 
 
-            
+            tl.check_for_deaths(persons, VideoSource.new_size, VideoSource.nb_frame)
+
             #detect contours on the extracted foreground
             temp_recherche_contour = copy(forground)
             contours,hierarchy = cv2.findContours( temp_recherche_contour, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
@@ -307,9 +311,12 @@ def main():
 
                     #t['update_persons'] = time.time()
 
+
                     tl.update_persons_zones(persons, VideoSource.nb_frame, zones)
 
                     #t['update_zones'] = time.time()
+
+                    
                     
         
             '''
@@ -341,12 +348,14 @@ def main():
 
 
         #display the frame
-        #cv2.imshow('Forground detection',forground)
+        cv2.imshow('Forground detection',forground)
         cv2.imshow('frameshow',frame_annotation)
 
         #print("FRAME "+str(VideoSource.nb_frame)+" "+str(round(VideoSource.nb_frame/(time.time()-cf.T_START)))+" FPS")  
         
         #timer.append(t)         
+
+    t_end = time.time()
 
     #release the camera and close opencv windows
     VideoSource.release()
@@ -359,7 +368,16 @@ def main():
     print("--------------------------")
     print("Summary")
     #data = {'persons':[]}
+
+
+
+    print("{} Frames".format(VideoSource.nb_frame))
+    print("{} s".format(round(t_end - cf.T_START, 2)))
+    print("{} AVG FPS".format(float(VideoSource.nb_frame)/(time.time()-cf.T_START)))
+    print("{} ms/frame".format(round(((time.time()-cf.T_START)*1000)/float(VideoSource.nb_frame), 2)))
     print("--------------------------")
+
+
     
     print("{} persons detected".format(len(persons)))
     for p in persons:
@@ -370,7 +388,7 @@ def main():
         data.get('persons').append(temp)
         '''
         #print(str(p.uuid)+ ": "+ str(len(p.liste_positions)) +" positions detected")
-        print("{}: age {}".format(p.uuid, p.age))
+        print("{} age {}".format(p.uuid, p.age))
     
     print("--------------------------")
     print("Zones")
@@ -382,14 +400,11 @@ def main():
     
     print("--------------------------")
 
-    '''
+    
 
-    t_end = time.time()
-    print("{} Frames".format(VideoSource.nb_frame))
-    print("{} s".format(round(t_end - cf.T_START, 2)))
-    print("{} AVG FPS".format(float(VideoSource.nb_frame)/(time.time()-cf.T_START)))
-    print("{} ms/frame".format(round(((time.time()-cf.T_START)*1000)/float(VideoSource.nb_frame), 2)))
-    print("--------------------------")
+    
+
+    '''
     tot = {}
     tot['next_frame'] = 0
     tot['foreground'] = 0

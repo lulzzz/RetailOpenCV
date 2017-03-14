@@ -55,7 +55,7 @@ TRAIN_FRAMES = 150
 
 # Operateurs morphologiques
 
-FG_O_OP=3    #10 #opening
+FG_O_OP=2    #10 #opening
 FG_C_OP=8    #15 #closing
 
 STR_ELEMENT=cv2.MORPH_ELLIPSE
@@ -67,14 +67,15 @@ c_kernel=cv2.getStructuringElement(STR_ELEMENT,(FG_C_OP,FG_C_OP))
 
 
 #Minimum contour size for detection
-CNT_MIN = 30
-
+#CNT_MIN = 30
+CNT_MIN = 10
 
 #Person criteria
 '''
 MAX_DIST_CENTRE = 180
 MAX_PERS_SIZE = 300
 MIN_PERS_SIZE = 50
+'''
 '''
 MIN_SIZE_CNT_PERS = 30
 
@@ -87,6 +88,19 @@ MAX_PERS_SIZE_Y = 300
 
 MIN_PERS_SIZE_X = 40
 MIN_PERS_SIZE_Y = 60
+'''
+
+MIN_SIZE_CNT_PERS = 5
+
+
+MAX_DIST_CENTER_X = 15
+MAX_DIST_CENTER_Y = 15
+
+MAX_PERS_SIZE_X = 100
+MAX_PERS_SIZE_Y = 100
+
+MIN_PERS_SIZE_X = 5
+MIN_PERS_SIZE_Y = 5
 
 #FRAME LIMITS (KILLING ZONE)
 

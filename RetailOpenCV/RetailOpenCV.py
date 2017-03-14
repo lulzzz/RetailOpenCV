@@ -22,11 +22,13 @@ import os
 from multiprocessing import Process, TimeoutError
 
 
-input_video = "C:\\Users\\Olivier Staub\\Documents\\videoset\\chute16\\cam1.avi"
+input_video = "C:\\Users\\Olivier Staub\\Documents\\videoset\\chute16\\cam2.avi"
 
 #input_video = "C:\\Users\\Olivier Staub\\Documents\\ComputerVision_Detect_Body\\videoset\\chute16\\cam2.avi"
 
-#input_video = 1
+input_video = 1
+
+input_video="C:\\Users\\Olivier Staub\\Pictures\\Camera Roll\\WIN_20170314_17_59_20_Pro.mp4"
 
 #input_video = "C:\\Users\\Olivier Staub\\Documents\\footage\\ex1.mp4"
 #input_video = "C:\\Users\\Olivier Staub\\Documents\\footage\\cafet.MOV"

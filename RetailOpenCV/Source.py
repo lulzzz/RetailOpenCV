@@ -30,7 +30,7 @@ class Source(object):
 
         if (path == 1):
             self.camera.set(3, 640)
-            self.camera.set(4, 360)
+            self.camera.set(4, 480)
             
         self.original_size = self.camera.get(3), self.camera.get(4)
 

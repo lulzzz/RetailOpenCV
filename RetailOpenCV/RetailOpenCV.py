@@ -24,7 +24,7 @@ from multiprocessing import Process, TimeoutError
 
 #input_video = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute10\\cam2.avi"
 
-input_video = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\footage\\Street2960.mp4"
+input_video = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\street\\07\\street960.mp4"
 
 
 #input_video = "C:\\Users\\Olivier Staub\\Documents\\ComputerVision_Detect_Body\\videoset\\chute16\\cam2.avi"
@@ -67,6 +67,7 @@ class SendDataThread(threading.Thread):
 		while not self.stopped():
 			time.sleep(1)
 			self.send_data()
+			
 
 	def stop(self):
 		self._stop.set()
@@ -91,14 +92,16 @@ class SendDataThread(threading.Thread):
 			for p in cf.to_be_sent:
 				temp = {}
 				temp['person'] = p[0]
-				temp['exits'] = p[1]
-				temp['enters'] = p[2]
+				temp['event'] = p[1]
+				temp['zone'] = p[2]
 				temp['timestamp'] = p[3]
+
 				data['data'].append(temp)
 
 			#print(json.dumps(data))
 			
 			tl.post_results(data)
+			#print('send data')
 			#print("{} items sent".format(len(cf.to_be_sent)))
 			cf.to_be_sent = []
 			#API POST
@@ -109,19 +112,38 @@ class SendDataThread(threading.Thread):
 				print('An error occured while sendind the data')
 			'''
 			
-	   
+def print_annotation(frame, VideoSource, persons, backup):
+
+	lignes = []
+	temp = copy(frame)
+		
+	#if self.display_frame_dim:
+	lignes.append(str(int(VideoSource.new_size[0]))+"x"+str(int(VideoSource.new_size[1])))
+
+	#if self.display_frame_number:
+	lignes.append("Frame {} / {}".format(str(VideoSource.nb_frame), str(int(VideoSource.nb_total_frame))))
+
+	lignes.append("FPS "+str(round(VideoSource.nb_frame/(time.time()-cf.T_START),2)))
+
+	lignes.append("{} alive".format(len(persons)))
+	lignes.append("{} dead".format(len(backup)))
+
+	for ligne in enumerate(lignes):
+		cv2.putText(temp,ligne[1],(0,12*(ligne[0]+1)+3*ligne[0]), cf.FONT, 0.5,cf.ANOTATION_COLOR,2)
+		
+	return temp
 
 def draw_general_infos(VideoSource, frame_annotation, zones):
 	#show config distance and size at the bottom of the frame
-	'''
-	cv2.line(frame_annotation, (4, int(VideoSource.new_size[1])), (4, int(VideoSource.new_size[1])-cf.MIN_PERS_SIZE_Y),  (0,0,255),2)
-	cv2.line(frame_annotation, (8, int(VideoSource.new_size[1])), (8, int(VideoSource.new_size[1])-cf.MAX_PERS_SIZE_Y), (0,255,0),2)
-	cv2.line(frame_annotation, (12, int(VideoSource.new_size[1])), (12, int(VideoSource.new_size[1])-cf.MAX_DIST_CENTER_Y), (255,0,0), 2)
+	
+	cv2.line(frame_annotation, (4, int(VideoSource.new_size[1])), (4, int(VideoSource.new_size[1])-cf.MIN_PERS_SIZE_Y),  (0,0,255),1)
+	cv2.line(frame_annotation, (8, int(VideoSource.new_size[1])), (8, int(VideoSource.new_size[1])-cf.MAX_PERS_SIZE_Y), (0,255,0),1)
+	cv2.line(frame_annotation, (12, int(VideoSource.new_size[1])), (12, int(VideoSource.new_size[1])-cf.MAX_DIST_CENTER_Y), (255,0,0), 1)
 
-	cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-4), (cf.MIN_PERS_SIZE_X, int(VideoSource.new_size[1])-4), (0,0,255),2)
-	cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-8), (cf.MAX_PERS_SIZE_X, int(VideoSource.new_size[1])-8), (0,255,0),2)
-	cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-12), (cf.MAX_DIST_CENTER_X, int(VideoSource.new_size[1])-12), (255,0,0), 2)
-	'''    
+	cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-4), (cf.MIN_PERS_SIZE_X, int(VideoSource.new_size[1])-4), (0,0,255),1)
+	cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-8), (cf.MAX_PERS_SIZE_X, int(VideoSource.new_size[1])-8), (0,255,0),1)
+	cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-12), (cf.MAX_DIST_CENTER_X, int(VideoSource.new_size[1])-12), (255,0,0), 1)
+	
 	 
 	#recording dot
 	cv2.circle(frame_annotation, (int(VideoSource.new_size[0])-16, 15), 6, (0,255,0), -1)
@@ -146,6 +168,7 @@ def draw_zones(zones, frame_annotation):
 			cv2.addWeighted(section_overlay, 0.15, section_frame_annotation, 1 - 0.15, 0, section_frame_annotation)
 			frame_annotation[y:y+h, x:x+w] = section_frame_annotation
 			cv2.drawContours(frame_annotation, m[1], 0, m[2][1], 2)
+			cv2.drawContours(frame_annotation, m[1], 0, (255,255,255), 1)
 
 
 def draw_persons(persons, VideoSource, frame_annotation, frame_annotation_copy):
@@ -176,16 +199,18 @@ def draw_persons(persons, VideoSource, frame_annotation, frame_annotation_copy):
 							
 			#draw current person's position on the frame
 			cv2.circle(frame_annotation, per.position_last_frame(VideoSource.nb_frame), 4, per.couleur, -1)
-
+			'''
 			for p in per.liste_positions:
 				cv2.circle(frame_annotation, p[0], 1, per.couleur, -1)
+			'''
+	'''
 
 	persons_dead = [p for p in persons if not p.alive]
 
 	if len(persons_dead) > 0:
 		for per in persons_dead:
 			cv2.drawContours(frame_annotation, per.contour_last_frame(VideoSource.nb_frame), -1, (255,255,255), 1)
-		
+	'''
 
 def main():
 
@@ -207,6 +232,7 @@ def main():
 
 	#liste of persons detected
 	persons = []
+	backup_dead_persons = []
 
 	#init thread in charge of sending data to the api endpoint
 	sendingDataThread = SendDataThread()
@@ -256,8 +282,7 @@ def main():
 		#t['foreground'] = time.time()
 		
 		#prepare the frame to be displayed
-		frame_annotation = VideoSource.frame_with_annotation()
-
+		frame_annotation = print_annotation(frame, VideoSource, persons, backup_dead_persons)
 		
 		#['annotations'] = time.time()
 
@@ -265,7 +290,7 @@ def main():
 		if (VideoSource.nb_frame > cf.TRAIN_FRAMES):
 
 
-			tl.check_for_deaths(persons, VideoSource.new_size, VideoSource.nb_frame)
+			tl.check_for_deaths(zones, persons, VideoSource.new_size, VideoSource.nb_frame, backup_dead_persons)
 
 			#detect contours on the extracted foreground
 			temp_recherche_contour = copy(forground)
@@ -275,7 +300,6 @@ def main():
 
 			#init liste that contains the probable persons detected on the frame
 			temp_persons_detected_on_current_frame = []
-		 
 			
 			#if some contours were actually detected on the frame, we process them
 			if len(contours) > 0:
@@ -390,24 +414,28 @@ def main():
 	print("{} ms/frame".format(round(((time.time()-cf.T_START)*1000)/float(VideoSource.nb_frame), 2)))
 	print("--------------------------")
 
-
-	
-	print("{} persons detected".format(len(persons)))
-	for p in persons:
-		'''
-		temp = {}
-		temp['id'] = str(p.uuid)
-		temp['positions'] = str(len(p.liste_positions))
-		data.get('persons').append(temp)
-		'''
-		#print(str(p.uuid)+ ": "+ str(len(p.liste_positions)) +" positions detected")
+	print("{} persons detected".format(len(persons)+len(backup_dead_persons)))
+	print("{} backuped".format(len(backup_dead_persons)))
+	'''
+	for p in backup_dead_persons:
 		print("{} age {}".format(p.uuid, p.age))
+	'''
+	
+	#for p in persons:
+	'''
+	temp = {}
+	temp['id'] = str(p.uuid)
+	temp['positions'] = str(len(p.liste_positions))
+	data.get('persons').append(temp)
+	'''
+	#print(str(p.uuid)+ ": "+ str(len(p.liste_positions)) +" positions detected")
+	#print("{} age {}".format(p.uuid, p.age))
 	
 	print("--------------------------")
 	print("Zones")
 	
 	for m in zones.masks:
-		print("{}: {} entries, {} exists".format(m[0].title(), zones.count["entries"][m[0]], zones.count["exits"][m[0]]))
+		print("{} in {} out {}".format(m[0].title(), zones.count["entries"][m[0]], zones.count["exits"][m[0]]))
 
 	
 	

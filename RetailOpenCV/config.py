@@ -39,7 +39,7 @@ CAMERA_ID = get_camera_id()
 
 #Aquisition
 
-MAX_LONGER_SIDE = 1024
+MAX_LONGER_SIDE = 960
 
 #Filled at init source in order to determine limits and min/max sizes
 CURRENT_FRAME_SIZE = 0
@@ -60,23 +60,23 @@ FG_C_OP=8    #15 #closing
 
 STR_ELEMENT=cv2.MORPH_ELLIPSE
 
-
-
 o_kernel=cv2.getStructuringElement(STR_ELEMENT,(FG_O_OP,FG_O_OP))
 c_kernel=cv2.getStructuringElement(STR_ELEMENT,(FG_C_OP,FG_C_OP))  
 
 
 #Minimum contour size for detection
-#CNT_MIN = 30
-CNT_MIN = 10
-
-#Person criteria
 '''
 MAX_DIST_CENTRE = 180
 MAX_PERS_SIZE = 300
 MIN_PERS_SIZE = 50
 '''
+
+
+
+''' Chutes Config '''
 '''
+CNT_MIN = 30
+
 MIN_SIZE_CNT_PERS = 30
 
 
@@ -90,26 +90,31 @@ MIN_PERS_SIZE_X = 40
 MIN_PERS_SIZE_Y = 60
 '''
 
-MIN_SIZE_CNT_PERS = 5
+''' Lego Config '''
 
 
-MAX_DIST_CENTER_X = 15
+CNT_MIN = 5
+
+MIN_SIZE_CNT_PERS = 10
+
+
+MAX_DIST_CENTER_X = 30
 MAX_DIST_CENTER_Y = 15
 
-MAX_PERS_SIZE_X = 100
+MAX_PERS_SIZE_X = 150
 MAX_PERS_SIZE_Y = 100
 
-MIN_PERS_SIZE_X = 5
-MIN_PERS_SIZE_Y = 5
+MIN_PERS_SIZE_X = 10
+MIN_PERS_SIZE_Y = 10
 
 #FRAME LIMITS (KILLING ZONE)
 
-DEAD_ZONE_Y = 30
-DEAD_ZONE_X = 40
+DEAD_ZONE_Y = 15
+DEAD_ZONE_X = 12
 
-NO_SEE_FRAMES_BEFORE_DEATH = 250
+NO_SEE_FRAMES_BEFORE_DEATH = 100
 
 ALPHA = 0.5
 
 
-DIR_ZONES = "C:\\Users\\Olivier Staub\\Documents\\zones"
+DIR_ZONES = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\zones"

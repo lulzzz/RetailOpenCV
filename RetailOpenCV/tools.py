@@ -187,7 +187,7 @@ def check_for_deaths(persons, new_size, nb_frame):
             if nb_frame - p.last_frame_seen > cf.NO_SEE_FRAMES_BEFORE_DEATH:
                 p.alive = False
                 print("{} {} {} dies in zone: {} age: {}".format(nb_frame, time(), str(p.uuid), p.last_zone(), p.age))
-            if p.close_from_borders(new_size) & (( nb_frame - p.last_frame_seen) > 100):
+            if p.close_from_borders(new_size) & (( nb_frame - p.last_frame_seen) > 5):
                 p.alive = False
                 print("{} {} {} dies in zone: {} age: ".format(nb_frame, time(), str(p.uuid), p.last_zone(), p.age))
 

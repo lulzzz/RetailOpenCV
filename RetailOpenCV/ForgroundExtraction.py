@@ -24,7 +24,7 @@ class ForgroundExtraction(object):
         elif (self._algo == 1):
             self.fgbg = cv2.BackgroundSubtractorMOG()  
         elif (self._algo == 2):
-            self.fgbg = cv2.BackgroundSubtractorMOG2(0, 128, False)   
+            self.fgbg = cv2.BackgroundSubtractorMOG2(0, 200, False)   
             
 
     def update(self, frame, nb_frame):
@@ -45,7 +45,7 @@ class ForgroundExtraction(object):
                 return self.fgmask
         elif (self._algo == 1)|(self._algo == 2):
             self.fgmask = self.fgbg.apply(frame, learningRate = cf.LR)   
-            self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_OPEN, cf.o_kernel, iterations=1)
+            self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_OPEN, cf.o_kernel, iterations=2)
             self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_CLOSE, cf.c_kernel,iterations=1)
             
             #self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_OPEN, cf.o_kernel, iterations=1)

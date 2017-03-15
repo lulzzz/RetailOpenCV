@@ -25,7 +25,7 @@ from multiprocessing import Process, TimeoutError
 
 #input_video = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute10\\cam2.avi"
 
-input_video = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\street\\08\\street960.mp4"
+#input_video = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\street\\08\\street960.mp4"
 
 #input_video = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute22\\cam2.avi"
 
@@ -56,7 +56,7 @@ input_video = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\street\\08\
 
 
 
-#input_video = "/Users/Olivier/GitHub/Retail/chute/01/cam8.avi"
+input_video = "/Users/Olivier/GitHub/Retail/chute/01/cam8.avi"
 #input_video = "/Users/Olivier/GitHub/Retail/footage/cafet2.mp4"
 
 
@@ -203,10 +203,13 @@ def draw_persons(persons, VideoSource, frame_annotation, frame_annotation_copy):
 							
 			#draw current person's position on the frame
 			cv2.circle(frame_annotation, per.position_last_frame(VideoSource.nb_frame), 4, per.couleur, -1)
-			'''
-			for p in per.liste_positions:
-				cv2.circle(frame_annotation, p[0], 1, per.couleur, -1)
-			'''
+			
+			previous_pos = 0,0
+			for i,p in enumerate(per.liste_positions):
+				if (i>0):
+					cv2.line(frame_annotation, previous_pos, p[0], per.couleur, 2)
+				previous_pos = p[0]
+			
 	'''
 
 	persons_dead = [p for p in persons if not p.alive]

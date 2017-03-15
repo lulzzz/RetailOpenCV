@@ -39,7 +39,7 @@ class Source(object):
 
 		self.new_size = self.video_dim()
 
-		print("New size: {} x {}".format(self.new_size[0], self.new_size[1]))
+		print("Render size: {} x {}".format(self.new_size[0], self.new_size[1]))
 
 		cf.CURRENT_FRAME_SIZE = self.new_size
 		self.current_frame = np.zeros((int(self.video_dim()[0]), int(self.video_dim()[1])), dtype=np.uint8)
@@ -52,7 +52,7 @@ class Source(object):
 		(ret, frame) = self.camera.read()
 		if ret:
 			self.nb_frame += 1
-   
+
 			if (self.original_size != self.new_size):
 				frame = self.resize(frame)
 

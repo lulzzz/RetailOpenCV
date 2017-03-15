@@ -28,6 +28,9 @@
     <Compile Include="Contour.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="cython_tools.pyx">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ForgroundExtraction.py">
       <SubType>Code</SubType>
     </Compile>

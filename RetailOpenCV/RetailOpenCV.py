@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #Main file 
-
+#import cython_tools as ctl
 import numpy as np
 import cv2
 import config as cf
@@ -24,7 +24,10 @@ from multiprocessing import Process, TimeoutError
 
 #input_video = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute10\\cam2.avi"
 
-input_video = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\street\\07\\street960.mp4"
+input_video = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\street\\08\\street960.mp4"
+
+#input_video = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute22\\cam2.avi"
+
 
 
 #input_video = "C:\\Users\\Olivier Staub\\Documents\\ComputerVision_Detect_Body\\videoset\\chute16\\cam2.avi"
@@ -121,7 +124,7 @@ def print_annotation(frame, VideoSource, persons, backup):
 	lignes.append(str(int(VideoSource.new_size[0]))+"x"+str(int(VideoSource.new_size[1])))
 
 	#if self.display_frame_number:
-	lignes.append("Frame {} / {}".format(str(VideoSource.nb_frame), str(int(VideoSource.nb_total_frame))))
+	lignes.append("Frame {}/{}".format(str(VideoSource.nb_frame), str(int(VideoSource.nb_total_frame))))
 
 	lignes.append("FPS "+str(round(VideoSource.nb_frame/(time.time()-cf.T_START),2)))
 
@@ -212,8 +215,10 @@ def draw_persons(persons, VideoSource, frame_annotation, frame_annotation_copy):
 			cv2.drawContours(frame_annotation, per.contour_last_frame(VideoSource.nb_frame), -1, (255,255,255), 1)
 	'''
 
-def main():
 
+
+def main():
+	#cv2.setUseOptimized(True)
 	print("Start time {}".format(tl.time()))
 	
 	#initialisation
@@ -245,15 +250,20 @@ def main():
 	#initialise the zones object
 	zones = Zones(input_video, VideoSource.new_size)
 
+	cv2.namedWindow('frameshow', cv2.WINDOW_NORMAL)	
+	cv2.resizeWindow('frameshow', int(VideoSource.new_size[0]), int(VideoSource.new_size[1]))
+
 	#main loop
 	while (True):
 
-		#t = {}
+		t = {}
 
-		#t['start'] = time.time()
+		#t['next_frame'] = time.time()
 
 		#new frame acquisition
 		ret,frame = VideoSource.next_frame()
+
+		#t['a_next_frame'] = time.time()
 
 
 		#break at the end of the video 
@@ -268,35 +278,39 @@ def main():
 
 
 		
-		#t['next_frame'] = time.time()
-
 		'''
 		'
 		'   PROCESSING
 		'
 		'''  
 		
+		#t['foreground'] = time.time()
+
 		#Foreground extraction
 		forground = fgbg.update(frame, VideoSource.nb_frame)
 
-		#t['foreground'] = time.time()
+		#t['a_foreground'] = time.time()
 		
 		#prepare the frame to be displayed
+		#t['draw_annotation'] = time.time()
 		frame_annotation = print_annotation(frame, VideoSource, persons, backup_dead_persons)
-		
-		#['annotations'] = time.time()
+		#t['a_draw_annotation'] = time.time()
 
 		#wait TRAIN_FRAMES frames to train the background
 		if (VideoSource.nb_frame > cf.TRAIN_FRAMES):
 
-
+			#t['check_for_deaths'] = time.time()
 			tl.check_for_deaths(zones, persons, VideoSource.new_size, VideoSource.nb_frame, backup_dead_persons)
+			#t['a_check_for_deaths'] = time.time()
+
 
 			#detect contours on the extracted foreground
 			temp_recherche_contour = copy(forground)
+
+			#t['find_contours'] = time.time()
 			contours,hierarchy = cv2.findContours( temp_recherche_contour, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-			
-			#t['detect_contours'] = time.time()
+			#t['a_find_contours'] = time.time()
+
 
 			#init liste that contains the probable persons detected on the frame
 			temp_persons_detected_on_current_frame = []
@@ -336,7 +350,11 @@ def main():
 					#try to detect groups on contours that could be persons on the frame
 					previous_len_cnt = 0                    
 					while (len(contours)>0) & previous_len_cnt < len(contours):
+
+						#t['search_persons_on_frame'] = time.time()
 						res, l = (tl.search_person_on_frame(contours))
+						#t['a_search_persons_on_frame'] = time.time()
+
 						if (res==1):
 							temp_persons_detected_on_current_frame.append(l)
 						previous_len_cnt = len(contours)
@@ -344,16 +362,14 @@ def main():
 					#t['search_persons'] = time.time()
 
 					#when possible persons are identified on the frame, try to track them, ie associate these persons with the ones already registered
-					tl.update_persons(persons, VideoSource.nb_frame, temp_persons_detected_on_current_frame)
-
 					#t['update_persons'] = time.time()
+					tl.update_persons(persons, VideoSource.nb_frame, temp_persons_detected_on_current_frame)
+					#t['a_update_persons'] = time.time()
 
-
-					tl.update_persons_zones(persons, VideoSource.nb_frame, zones)
 
 					#t['update_zones'] = time.time()
-
-					
+					tl.update_persons_zones(persons, VideoSource.nb_frame, zones)
+					#t['a_update_zones'] = time.time()				
 					
 		
 			'''
@@ -364,33 +380,43 @@ def main():
 
 			#draw general information
 			#frame_annotation_copy = frame_annotation.copy()
+			#t['draw_general'] = time.time()
 			draw_general_infos(VideoSource, frame_annotation, zones)
-			
+			#t['a_draw_general'] = time.time()
+
 			#draw detection zone on the frame
+			#t['draw_zones'] = time.time()
 			draw_zones(zones, frame_annotation)
+			#t['a_draw_zones'] = time.time()
 
 			#draw the detected persons on the frame
+			#t['draw_persons'] = time.time()
 			draw_persons(persons, VideoSource, frame_annotation, frame_annotation)
-						   
-				#frame_annotation[x:y, x+w:y+h] = section_frame_annotation
-						 
-				#cv2.imshow('overlay', overlay)   
-
-				
-
-				#cv2.addWeighted(overlay, cf.ALPHA, frame_annotation, 1 - cf.ALPHA, 0, frame_annotation)
-			#t['draw'] = time.time()
+			#t['a_draw_persons'] = time.time()
 
 
 
 
 		#display the frame
 		#cv2.imshow('Forground detection',forground)
+		'''
+		window_aspect_ratio = cv2.getWindowProperty('frameshow', 2)
+		frame_aspect_ratio = VideoSource.new_size[0]/VideoSource.new_size[1]
+		
+		if window_aspect_ratio != frame_aspect_ratio:
+			cv2.setWindowProperty('frameshow', 2, frame_aspect_ratio)
+		'''
 		cv2.imshow('frameshow',frame_annotation)
 
 		#print("FRAME "+str(VideoSource.nb_frame)+" "+str(round(VideoSource.nb_frame/(time.time()-cf.T_START)))+" FPS")  
 		
-		#timer.append(t)         
+		timer.append(t)         
+
+
+
+
+
+
 
 	t_end = time.time()
 
@@ -441,25 +467,60 @@ def main():
 	
 	print("--------------------------")
 
-	
+	print("Timings")
 
-	
 
-	'''
 	tot = {}
 	tot['next_frame'] = 0
 	tot['foreground'] = 0
-	tot['annotations'] = 0
-	tot['detect_contours'] = 0
-	tot['contours_approx'] = 0
-	tot['contours_sort'] = 0
-	tot['contours_size_sort'] = 0
-	tot['search_persons'] = 0
+	tot['draw_annotation'] = 0
+	tot['check_for_deaths'] = 0
+	tot['find_contours'] = 0
+	tot['search_persons_on_frame'] = 0
 	tot['update_persons'] = 0
 	tot['update_zones'] = 0
-	tot['draw'] = 0
+	tot['draw_general'] = 0
+	tot['draw_zones'] = 0
+	tot['draw_persons'] = 0
 
 	for t in timer:
+
+
+		if 'next_frame' in t:
+			tot['next_frame'] += t['a_next_frame'] - t['next_frame']
+
+		if 'foreground' in t:
+			tot['foreground'] += (t['a_foreground'] - t['foreground'])
+
+		if 'draw_annotation' in t:
+			tot['draw_annotation'] += t['a_draw_annotation'] - t['draw_annotation']
+
+		if 'check_for_deaths' in t:
+			tot['check_for_deaths'] += t['a_check_for_deaths'] - t['check_for_deaths']
+
+		if 'find_contours' in t:
+			tot['find_contours'] += t['a_find_contours'] - t['find_contours']
+
+		if 'search_persons_on_frame' in t:
+			tot['search_persons_on_frame'] += t['a_search_persons_on_frame'] - t['search_persons_on_frame']
+
+		if 'update_persons' in t:
+			tot['update_persons'] += t['a_update_persons'] - t['update_persons']
+
+		if 'update_zones' in t:
+			tot['update_zones'] += t['a_update_zones'] - t['update_zones']
+
+		if 'draw_general' in t:
+			tot['draw_general'] += t['a_draw_general'] - t['draw_general']
+
+		if 'draw_zones' in t:
+			tot['draw_zones'] += t['a_draw_zones'] - t['draw_zones']
+
+		if 'draw_persons' in t:
+			tot['draw_persons'] += t['a_draw_persons'] - t['draw_persons']
+
+
+		'''
 		tot['next_frame'] += t['next_frame'] - t['start']
 		tot['foreground'] += t['foreground'] - t['next_frame']
 		tot['annotations'] += t['annotations'] - t['foreground']
@@ -479,13 +540,13 @@ def main():
 									tot['update_zones'] += t['update_zones'] - t['update_persons']
 									if 'draw' in t:
 										tot['draw'] += t['draw'] - t['update_zones']
-		
+		'''
 	for t in tot:
 		#t = float(t)/float(VideoSource.nb_frame)
 		print('{}: {}ms'.format(t, (float(tot[t])/VideoSource.nb_frame)*1000))
 	
 	print("--------------------------")
-	'''
+	
 
 
 	'''

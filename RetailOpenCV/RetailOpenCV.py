@@ -262,12 +262,12 @@ def main():
 
 		t = {}
 
-		#t['next_frame'] = time.time()
+		t['next_frame'] = time.time()
 
 		#new frame acquisition
 		ret,frame = VideoSource.next_frame()
 
-		#t['a_next_frame'] = time.time()
+		t['a_next_frame'] = time.time()
 
 
 		#break at the end of the video 
@@ -288,32 +288,32 @@ def main():
 		'
 		'''  
 		
-		#t['foreground'] = time.time()
+		t['foreground'] = time.time()
 
 		#Foreground extraction
 		forground = fgbg.update(frame, VideoSource.nb_frame)
 
-		#t['a_foreground'] = time.time()
+		t['a_foreground'] = time.time()
 		
 		#prepare the frame to be displayed
-		#t['draw_annotation'] = time.time()
+		t['draw_annotation'] = time.time()
 		frame_annotation = print_annotation(frame, VideoSource, persons, backup_dead_persons)
-		#t['a_draw_annotation'] = time.time()
+		t['a_draw_annotation'] = time.time()
 
 		#wait TRAIN_FRAMES frames to train the background
 		if (VideoSource.nb_frame > cf.TRAIN_FRAMES):
 
-			#t['check_for_deaths'] = time.time()
+			t['check_for_deaths'] = time.time()
 			tl.check_for_deaths(zones, persons, VideoSource.new_size, VideoSource.nb_frame, backup_dead_persons)
-			#t['a_check_for_deaths'] = time.time()
+			t['a_check_for_deaths'] = time.time()
 
 
 			#detect contours on the extracted foreground
 			temp_recherche_contour = copy(forground)
 
-			#t['find_contours'] = time.time()
+			t['find_contours'] = time.time()
 			contours,hierarchy = cv2.findContours( temp_recherche_contour, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-			#t['a_find_contours'] = time.time()
+			t['a_find_contours'] = time.time()
 
 
 			#init liste that contains the probable persons detected on the frame
@@ -336,13 +336,11 @@ def main():
 
 				cnt_approx = contours
 
-				#t['contours_approx'] = time.time()
 
 
 				#only keep the bigger contours (for noise removal)
 				contours = [c for c in cnt_approx if cv2.contourArea(c)>cf.CNT_MIN]
 
-				#t['contours_sort'] = time.time()
 
 				#if there are still some contours big enough present on the frame
 				if len(contours) > 0:
@@ -355,25 +353,24 @@ def main():
 					previous_len_cnt = 0                    
 					while (len(contours)>0) & previous_len_cnt < len(contours):
 
-						#t['search_persons_on_frame'] = time.time()
+						t['search_persons_on_frame'] = time.time()
 						res, l = (tl.search_person_on_frame(contours))
-						#t['a_search_persons_on_frame'] = time.time()
+						t['a_search_persons_on_frame'] = time.time()
 
 						if (res==1):
 							temp_persons_detected_on_current_frame.append(l)
 						previous_len_cnt = len(contours)
 
-					#t['search_persons'] = time.time()
 
 					#when possible persons are identified on the frame, try to track them, ie associate these persons with the ones already registered
-					#t['update_persons'] = time.time()
+					t['update_persons'] = time.time()
 					tl.update_persons(persons, VideoSource.nb_frame, temp_persons_detected_on_current_frame)
-					#t['a_update_persons'] = time.time()
+					t['a_update_persons'] = time.time()
 
 
-					#t['update_zones'] = time.time()
+					t['update_zones'] = time.time()
 					tl.update_persons_zones(persons, VideoSource.nb_frame, zones)
-					#t['a_update_zones'] = time.time()				
+					t['a_update_zones'] = time.time()				
 					
 		
 			'''
@@ -384,19 +381,19 @@ def main():
 
 			#draw general information
 			#frame_annotation_copy = frame_annotation.copy()
-			#t['draw_general'] = time.time()
+			t['draw_general'] = time.time()
 			draw_general_infos(VideoSource, frame_annotation, zones)
-			#t['a_draw_general'] = time.time()
+			t['a_draw_general'] = time.time()
 
 			#draw detection zone on the frame
-			#t['draw_zones'] = time.time()
+			t['draw_zones'] = time.time()
 			draw_zones(zones, frame_annotation)
-			#t['a_draw_zones'] = time.time()
+			t['a_draw_zones'] = time.time()
 
 			#draw the detected persons on the frame
-			#t['draw_persons'] = time.time()
+			t['draw_persons'] = time.time()
 			draw_persons(persons, VideoSource, frame_annotation, frame_annotation)
-			#t['a_draw_persons'] = time.time()
+			t['a_draw_persons'] = time.time()
 
 
 

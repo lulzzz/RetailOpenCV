@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 #Main file 
-#import cython_tools as ctl
+#import pyximport; pyximport.install()
 import numpy as np
 import cv2
 import config as cf
 import tools as tl
+#import cython_tools as ctl
 from datetime import datetime
 import time
 import logging

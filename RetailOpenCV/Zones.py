@@ -35,7 +35,7 @@ class Zones(object):
 
 		self.count = {"entries":{}, "exits":{}}
 
-
+		print("Zone 1 Neutral")
 		if (video_dir != ""):
 			zone_id = 2
 			for file in os.listdir(video_dir):

@@ -30,6 +30,7 @@ class Person(object):
         self.liste_positions = [(self.position_last_frame(nb_frame), nb_frame)]
 
         self.uuid = str(uuid.uuid4())
+        self.puuid = self.uuid[0:6]
 
         self.liste_zones = []
 

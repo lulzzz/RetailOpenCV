@@ -21,10 +21,10 @@ ANOTATION_COLOR = (0,255,0)
 to_be_sent = []
 
 
-#API endpoints
+#API configuration
 API_GET_CAM_ID = ""
-API_POST_RESULTS = ""
-
+API_POST_RESULTS = "cargo-hub.azureswebsites.net/api/hublog/notify"
+API_DEBUG = True
 OUTPUTFILE = fichier = open("out.json", "w")
 
 def get_camera_id():

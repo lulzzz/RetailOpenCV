@@ -32,7 +32,7 @@ input_video = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\street\\01\
 
 #input_video = "C:\\Users\\Olivier Staub\\Documents\\ComputerVision_Detect_Body\\videoset\\chute16\\cam2.avi"
 
-#input_video = 1
+input_video = 1
 
 #input_video="C:\\Users\\Olivier Staub\\Pictures\\Camera Roll\\WIN_20170314_17_59_20_Pro.mp4"
 
@@ -52,7 +52,6 @@ input_video = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\street\\01\
 #input_video="C:\\Users\\Olivier\\Documents\\retail\\chute\\23\\cam2.avi"
 #input_video="C:\\Users\\Olivier\\Documents\\retail\\chute\\02\\cam2.avi"
 #input_video="C:\\Users\\Olivier\\Documents\\retail\\chute\\14\\cam3.avi"
-
 
 
 #input_video = "/Users/Olivier/GitHub/Retail/chute/01/cam8.avi"
@@ -97,6 +96,7 @@ class SendDataThread(threading.Thread):
             data = {}
             data['timestamp'] = tl.time()
             data['logs'] = []
+            data['debug'] = cf.API_DEBUG
             #data['camera_id'] = cf.CAMERA_ID
             
 
@@ -128,7 +128,7 @@ class SendDataThread(threading.Thread):
             
             tl.post_results(data)
             #print('send data')
-            #print("{} items sent".format(len(cf.to_be_sent)))
+            print("API {} items sent".format(len(cf.to_be_sent)))
             cf.to_be_sent = []
             #API POST
             '''
@@ -149,9 +149,9 @@ def print_annotation(frame, VideoSource, persons, backup, zones):
     #if self.display_frame_number:
     lignes.append("Frame {}/{}".format(str(VideoSource.nb_frame), str(int(VideoSource.nb_total_frame))))
 
-    #lignes.append("FPS "+str(round(VideoSource.nb_frame/(time.time()-cf.T_START),2)))
-    lignes.append("Tracking {} items".format(len(persons)))
-    #lignes.append("{} dead".format(len(backup)))
+    lignes.append("FPS "+str(round(VideoSource.nb_frame/(time.time()-cf.T_START),2)))
+    lignes.append("{} alive".format(len(persons)))
+    lignes.append("{} dead".format(len(backup)))
     
     for z in zones.masks:
         lignes.append("Zone {}: {} objects".format(z[3], zones.count["entries"][z[0]] - zones.count["exits"][z[0]]))
@@ -200,9 +200,6 @@ def draw_zones(zones, frame_annotation):
             cv2.drawContours(frame_annotation, m[1], 0, (255,255,255), 1)
             cv2.putText(frame_annotation, str(m[3]), (x, y+48), cf.FONT, 2, m[2][0], 3)
             cv2.putText(frame_annotation, str(m[3]), (x, y+48), cf.FONT, 2, (255,255,255), 1)
-    
-
-    
 
 
 def draw_persons(persons, VideoSource, frame_annotation, frame_annotation_copy):
@@ -233,16 +230,13 @@ def draw_persons(persons, VideoSource, frame_annotation, frame_annotation_copy):
             #draw current person's position on the frame
             cv2.circle(frame_annotation, per.position_last_frame(VideoSource.nb_frame), 4, per.couleur, -1)
             
-            previous_pos = 0,0
-            
-            
+            previous_pos = (0,0)
+            '''
             for i,p in enumerate(per.liste_positions):
                 if (i>0):
                     cv2.line(frame_annotation, previous_pos, p[0], per.couleur, 2)
                 previous_pos = p[0]
-            
-                
-
+            '''
             
     '''
 
@@ -405,16 +399,16 @@ def main():
                             temp_persons_detected_on_current_frame.append(l)
                         previous_len_cnt = len(contours)
 
+                    if (len(temp_persons_detected_on_current_frame)>0)&(len(temp_persons_detected_on_current_frame)<30):
+                        #when possible persons are identified on the frame, try to track them, ie associate these persons with the ones already registered
+                        #t['update_persons'] = time.time()
+                        tl.update_persons(persons, VideoSource.nb_frame, temp_persons_detected_on_current_frame)
+                        #t['a_update_persons'] = time.time()
 
-                    #when possible persons are identified on the frame, try to track them, ie associate these persons with the ones already registered
-                    #t['update_persons'] = time.time()
-                    tl.update_persons(persons, VideoSource.nb_frame, temp_persons_detected_on_current_frame)
-                    #t['a_update_persons'] = time.time()
 
-
-                    #t['update_zones'] = time.time()
-                    tl.update_persons_zones(persons, VideoSource.nb_frame, zones)
-                    #t['a_update_zones'] = time.time()				
+                        #t['update_zones'] = time.time()
+                        tl.update_persons_zones(persons, VideoSource.nb_frame, zones)
+                        #t['a_update_zones'] = time.time()				
                     
         
             '''

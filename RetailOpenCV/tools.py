@@ -40,14 +40,16 @@ def ymin_point(cnt):
 
 
 def post_results(data):
-	'''
-	res = requests.post(cf.API_POST_RESULTS, json=data)
+	send_json = json.dumps(data)
+	cf.OUTPUTFILE.write("\n"+send_json)
+	res = requests.post(cf.API_POST_RESULTS, json=send_json)
 	if res.status_code == 200:
+		print("API {} recieved".format(res.text))
 		return True      
 	else:
 		return False
-	'''
-	cf.OUTPUTFILE.write("\n"+json.dumps(data))
+	
+	
 	
 
 def compare_contour_aera(cnt1, cnt2):
@@ -201,10 +203,10 @@ def check_for_deaths(zones, persons, new_size, nb_frame, backup):
 			count_alive += 1
 			if nb_frame - p.last_frame_seen > cf.NO_SEE_FRAMES_BEFORE_DEATH:
 				kill(zones, persons, i, p, nb_frame, backup)
-				print("{} {} {} dies    {} age {}".format(nb_frame, time(), str(p.uuid), p.last_zone(), p.age))
+				print("{} {} {} dies    {} age {}".format(nb_frame, time(), p.puuid, p.last_zone(), p.age))
 			if p.close_from_borders(new_size) & (( nb_frame - p.last_frame_seen) > 5):
 				kill(zones, persons, i, p, nb_frame, backup)
-				print("{} {} {} dies    {} age {}".format(nb_frame, time(), str(p.uuid), p.last_zone(), p.age))
+				print("{} {} {} dies    {} age {}".format(nb_frame, time(), p.puuid, p.last_zone(), p.age))
 		
 		elif not p.alive:
 			count_dead += 1
@@ -228,7 +230,7 @@ def update_persons_zones(persons, nb_frame, zones):
 				if previous_zone == 0:
 					p.add_zone(new_zone, nb_frame)
 					cf.to_be_sent.append((str(p.uuid), 0, new_zone, time()))
-					print('{} {} {} appears {}'.format(nb_frame, time(), str(p.uuid), new_zone))
+					print('{} {} {} appears {}'.format(nb_frame, time(), p.puuid, new_zone))
 					if (new_zone != 1):
 						zones.inc_in(new_zone)
 
@@ -238,18 +240,18 @@ def update_persons_zones(persons, nb_frame, zones):
 
 					else:
 						if (previous_zone == 1):
-							print('{} {} {} enters  {}'.format(nb_frame, time(), str(p.uuid), new_zone))
+							print('{} {} {} enters  {}'.format(nb_frame, time(), p.puuid, new_zone))
 							cf.to_be_sent.append((str(p.uuid), 2, new_zone, time()))
 							zones.inc_in(new_zone)
 
 						elif (new_zone == 1):
-							print('{} {} {} leaves  {}'.format(nb_frame, time(), str(p.uuid), previous_zone))
+							print('{} {} {} leaves  {}'.format(nb_frame, time(), p.puuid, previous_zone))
 							cf.to_be_sent.append((str(p.uuid), 3, previous_zone, time()))
 							zones.inc_out(previous_zone)
 
 						else:
-							print('{} {} {} leaves  {}'.format(nb_frame, time(), str(p.uuid), previous_zone))
-							print('{} {} {} enters  {}'.format(nb_frame, time(), str(p.uuid), new_zone))
+							print('{} {} {} leaves  {}'.format(nb_frame, time(), p.puuid, previous_zone))
+							print('{} {} {} enters  {}'.format(nb_frame, time(), p.puuid, new_zone))
 							#print('{} {} {} leaves  {} and enters {}'.format(nb_frame, time(), str(p.uuid), previous_zone, new_zone))
 							#cf.to_be_sent.append((str(p.uuid), "leaves", previous_zone, time()))
 							cf.to_be_sent.append((str(p.uuid), 3, previous_zone, time()))

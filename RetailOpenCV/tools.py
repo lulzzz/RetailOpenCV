@@ -190,6 +190,7 @@ def update_persons(persons, nb_frame, persons_on_frame):
 def kill(zones, persons, i, p, nb_frame, backup):
     p.alive = False;
     previous_zone_id = p.last_zone_id()	
+    previous_zone = p.last_zone()
     #p.add_zone(0, nb_frame)
     cf.to_be_sent.append((str(p.uuid), 1, previous_zone_id, time()))
     if previous_zone_id != 1:

@@ -46,7 +46,7 @@ input_video = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\street\\01\
 #input_video="C:\\Users\\Olivier\\Documents\\retail\\footage\\cafet.mov"
 
 
-#input_video="C:\\Users\\Olivier\\Documents\\retail\\street\\02\\street960.mp4"
+input_video="C:\\Users\\Olivier\\Documents\\retail\\street\\01\\street960.mp4"
 
 
 #input_video="C:\\Users\\Olivier\\Documents\\retail\\chute\\23\\cam2.avi"
@@ -106,8 +106,8 @@ class SendDataThread(threading.Thread):
             print("API {} items sent".format(len(cf.to_be_sent)))
             #print(json.dumps(data))
             
-            if (self.post_results(data)):
-                cf.to_be_sent = []
+            #if (self.post_results(data)):
+            cf.to_be_sent = []
 
 
     def post_results(self, data):

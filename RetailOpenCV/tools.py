@@ -11,7 +11,7 @@ from ForgroundExtraction import ForgroundExtraction
 from Person import Person
 import json
 import requests
-#from numba import jit
+from numba import jit
 
 
 def xmax(cnt):
@@ -156,7 +156,7 @@ def search_person_on_frame(contours):
 	else:
 		return False,[]
 
-
+#@jit
 def update_persons(persons, nb_frame, persons_on_frame):
 	
 	if len(persons) == 0:
@@ -185,8 +185,8 @@ def kill(zones, persons, i, p, nb_frame, backup):
 	p.alive = False;
 	previous_zone = p.last_zone()	
 	#p.add_zone(0, nb_frame)
-	cf.to_be_sent.append((str(p.uuid), 'dies', previous_zone, time()))
-	if previous_zone != -1:
+	cf.to_be_sent.append((str(p.uuid), 1, previous_zone, time()))
+	if previous_zone != 1:
 		zones.inc_out(previous_zone)
 	if p.age < 1000:
 		backup.append(copy(p))
@@ -201,10 +201,10 @@ def check_for_deaths(zones, persons, new_size, nb_frame, backup):
 			count_alive += 1
 			if nb_frame - p.last_frame_seen > cf.NO_SEE_FRAMES_BEFORE_DEATH:
 				kill(zones, persons, i, p, nb_frame, backup)
-				print("{} {} {} dies {} age {}".format(nb_frame, time(), str(p.uuid), p.last_zone(), p.age))
+				print("{} {} {} dies    {} age {}".format(nb_frame, time(), str(p.uuid), p.last_zone(), p.age))
 			if p.close_from_borders(new_size) & (( nb_frame - p.last_frame_seen) > 5):
 				kill(zones, persons, i, p, nb_frame, backup)
-				print("{} {} {} dies {} age {}".format(nb_frame, time(), str(p.uuid), p.last_zone(), p.age))
+				print("{} {} {} dies    {} age {}".format(nb_frame, time(), str(p.uuid), p.last_zone(), p.age))
 		
 		elif not p.alive:
 			count_dead += 1
@@ -219,7 +219,7 @@ def update_persons_zones(persons, nb_frame, zones):
 	for p in persons:
 			
 		if p.alive:
-			if p.exists_at_last_frame(nb_frame) :
+			if p.exists_at_last_frame(nb_frame):
 				
 				previous_zone = p.last_zone()
 
@@ -227,9 +227,9 @@ def update_persons_zones(persons, nb_frame, zones):
 
 				if previous_zone == 0:
 					p.add_zone(new_zone, nb_frame)
-					cf.to_be_sent.append((str(p.uuid), 'appears', new_zone, time()))
+					cf.to_be_sent.append((str(p.uuid), 0, new_zone, time()))
 					print('{} {} {} appears {}'.format(nb_frame, time(), str(p.uuid), new_zone))
-					if (new_zone != -1):
+					if (new_zone != 1):
 						zones.inc_in(new_zone)
 
 				else:
@@ -237,20 +237,23 @@ def update_persons_zones(persons, nb_frame, zones):
 						p.add_zone(new_zone, nb_frame)
 
 					else:
-						if (previous_zone == -1):
-							print('{} {} {} enters {}'.format(nb_frame, time(), str(p.uuid), new_zone))
-							cf.to_be_sent.append((str(p.uuid), 'enters', new_zone, time()))
+						if (previous_zone == 1):
+							print('{} {} {} enters  {}'.format(nb_frame, time(), str(p.uuid), new_zone))
+							cf.to_be_sent.append((str(p.uuid), 2, new_zone, time()))
 							zones.inc_in(new_zone)
 
-						elif (new_zone == -1):
-							print('{} {} {} leaves {}'.format(nb_frame, time(), str(p.uuid), previous_zone))
-							cf.to_be_sent.append((str(p.uuid), 'leaves', previous_zone, time()))
+						elif (new_zone == 1):
+							print('{} {} {} leaves  {}'.format(nb_frame, time(), str(p.uuid), previous_zone))
+							cf.to_be_sent.append((str(p.uuid), 3, previous_zone, time()))
 							zones.inc_out(previous_zone)
 
 						else:
-							print('{} {} {} leaves {} and enters {}'.format(nb_frame, time(), str(p.uuid), previous_zone, new_zone))
+							print('{} {} {} leaves  {}'.format(nb_frame, time(), str(p.uuid), previous_zone))
+							print('{} {} {} enters  {}'.format(nb_frame, time(), str(p.uuid), new_zone))
+							#print('{} {} {} leaves  {} and enters {}'.format(nb_frame, time(), str(p.uuid), previous_zone, new_zone))
 							#cf.to_be_sent.append((str(p.uuid), "leaves", previous_zone, time()))
-							cf.to_be_sent.append((str(p.uuid), "enters", new_zone, time()))
+							cf.to_be_sent.append((str(p.uuid), 3, previous_zone, time()))
+							cf.to_be_sent.append((str(p.uuid), 2, new_zone, time()))
 							zones.inc_out(previous_zone)
 							zones.inc_in(new_zone)
 
@@ -320,5 +323,5 @@ def random_color_zones():
 	return (rand, rand, rand)
 
 def time():
-	return str(datetime.utcnow());
+	return str(datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%S"));
 

@@ -48,9 +48,9 @@ CURRENT_FRAME_SIZE = 0
 #Forground Extraction Config
 
 ALGO = 2
-LR = 0.0015
+LR = 0.002
 
-TRAIN_FRAMES = 150
+TRAIN_FRAMES = 200
 
 
 # Operateurs morphologiques
@@ -117,4 +117,4 @@ ALPHA = 0.5
 
 DIR_ZONES = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\zones"
 #DIR_ZONES = "/Users/Olivier/GitHub/Retail/chute/zones"
-DIR_ZONES=""
+#DIR_ZONES=""

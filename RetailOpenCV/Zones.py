@@ -37,7 +37,9 @@ class Zones(object):
 
 
 		if (video_dir != ""):
+			zone_id = 2
 			for file in os.listdir(video_dir):
+				
 
 				if file.startswith(video_file):
 
@@ -61,9 +63,12 @@ class Zones(object):
 						#couleur = tl.random_color_zones()
 						couleur = tl.random_color()
 						#(name of the zone, liste of contours defining the zone, color of the zone on the frame)
-						self.masks.append((zone_name, contours, couleur))
+						self.masks.append((zone_name, contours, couleur, zone_id))
+						
 						self.count["entries"][zone_name] = 0
 						self.count["exits"][zone_name] = 0
+						print("Zone {} {}".format(zone_id, zone_name))
+						zone_id += 1
 
 	def nb_zones(self):
 		return len(self.masks)
@@ -74,7 +79,8 @@ class Zones(object):
 			for cnt in m[1]:
 				if (cv2.pointPolygonTest(cnt, position, False)==True):
 					return m[0]
-		return -1
+		#Neutral zone has ID 1
+		return 1
 
 
 	def inc_in(self, zone_name):

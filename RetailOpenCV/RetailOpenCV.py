@@ -42,12 +42,12 @@ from multiprocessing import Process, TimeoutError
 #input_video = "C:\\Users\\Olivier Staub\\Documents\\footage\\cafet2.mp4"
 #input_video = "C:\\Users\\Olivier Staub\\Documents\\footage\\foot1.mp4"
 
-#input_video = "C:\\Users\\Olivier Staub\\Documents\\ComputerVision_Detect_Body\\videoset\\chutes_fablab\\chute15.MP4"
-
-
 
 #input_video="C:\\Users\\Olivier\\Documents\\retail\\footage\\cafet2.mp4"
 #input_video="C:\\Users\\Olivier\\Documents\\retail\\footage\\cafet.mov"
+
+
+input_video="C:\\Users\\Olivier\\Documents\\retail\\street\\02\\street960.mp4"
 
 
 #input_video="C:\\Users\\Olivier\\Documents\\retail\\chute\\23\\cam2.avi"
@@ -56,7 +56,7 @@ from multiprocessing import Process, TimeoutError
 
 
 
-input_video = "/Users/Olivier/GitHub/Retail/chute/01/cam8.avi"
+#input_video = "/Users/Olivier/GitHub/Retail/chute/01/cam8.avi"
 #input_video = "/Users/Olivier/GitHub/Retail/footage/cafet2.mp4"
 
 
@@ -180,7 +180,6 @@ def draw_persons(persons, VideoSource, frame_annotation, frame_annotation_copy):
 	#check among the persons we have registered, which are currently on the frame so we can draw informations about them
 	
 	persons_to_draw = [p for p in persons if p.exists_at_last_frame(VideoSource.nb_frame) & p.alive]
-
 	if len(persons_to_draw) > 0:
 												
 		#draw bbox, contours and position on the frame for each person
@@ -205,10 +204,16 @@ def draw_persons(persons, VideoSource, frame_annotation, frame_annotation_copy):
 			cv2.circle(frame_annotation, per.position_last_frame(VideoSource.nb_frame), 4, per.couleur, -1)
 			
 			previous_pos = 0,0
+			
+			'''
 			for i,p in enumerate(per.liste_positions):
 				if (i>0):
 					cv2.line(frame_annotation, previous_pos, p[0], per.couleur, 2)
+					count += 1
 				previous_pos = p[0]
+			'''
+				
+
 			
 	'''
 
@@ -520,28 +525,6 @@ def main():
 		if 'draw_persons' in t:
 			tot['draw_persons'] += t['a_draw_persons'] - t['draw_persons']
 
-
-		'''
-		tot['next_frame'] += t['next_frame'] - t['start']
-		tot['foreground'] += t['foreground'] - t['next_frame']
-		tot['annotations'] += t['annotations'] - t['foreground']
-		if 'detect_contours' in t:        
-			tot['detect_contours'] += t['detect_contours'] - t['annotations']
-			if 'contours_approx' in t:
-				tot['contours_approx'] += t['contours_approx'] - t['detect_contours']
-				if 'contours_sort' in t:
-					tot['contours_sort'] += t['contours_sort'] - t['contours_approx']
-					if 'contours_size_sort' in t:
-						tot['contours_size_sort'] += t['contours_size_sort'] - t['contours_sort']
-						if 'search_persons' in t:
-							tot['search_persons'] += t['search_persons'] - t['contours_size_sort']
-							if 'update_persons' in t:
-								tot['update_persons'] += t['update_persons'] - t['search_persons']
-								if 'update_zones' in t:
-									tot['update_zones'] += t['update_zones'] - t['update_persons']
-									if 'draw' in t:
-										tot['draw'] += t['draw'] - t['update_zones']
-		'''
 	for t in tot:
 		#t = float(t)/float(VideoSource.nb_frame)
 		print('{}: {}ms'.format(t, (float(tot[t])/VideoSource.nb_frame)*1000))

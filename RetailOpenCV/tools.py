@@ -11,6 +11,7 @@ from ForgroundExtraction import ForgroundExtraction
 from Person import Person
 import json
 import requests
+#from numba import jit
 
 
 def xmax(cnt):
@@ -86,6 +87,7 @@ def bbox_overlap(bbox1, bbox2):
 
 def distance(pt1, pt2):
 	return int(math.sqrt(pow(pt1[0]-pt2[0], 2)+pow(pt1[1]-pt2[1], 2)))
+
 
 def search_person_on_frame(contours):
 	   
@@ -178,7 +180,7 @@ def update_persons(persons, nb_frame, persons_on_frame):
 		for pf in working_temp_p_on_frame:
 			persons.append(Person(nb_frame, pf))
 
-	
+
 def kill(zones, persons, i, p, nb_frame, backup):
 	p.alive = False;
 	previous_zone = p.last_zone()	
@@ -271,6 +273,7 @@ def update_persons_zones(persons, nb_frame, zones):
 		cf.to_be_sent.append((str(self.uuid), self.zone, new_zone, tl.time()))
 	self.zone = new_zone
 	'''
+
 
 def hsv_to_bgr(h,s,v):
 	c = v * s

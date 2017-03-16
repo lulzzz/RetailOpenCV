@@ -74,7 +74,7 @@ MIN_PERS_SIZE = 50
 
 
 ''' Chutes Config '''
-
+'''
 CNT_MIN = 30
 MIN_SIZE_CNT_PERS = 30
 
@@ -86,11 +86,11 @@ MAX_PERS_SIZE_Y = 300
 
 MIN_PERS_SIZE_X = 40
 MIN_PERS_SIZE_Y = 60
-
+'''
 
 ''' Lego Config '''
 
-'''
+
 CNT_MIN = 5
 MIN_SIZE_CNT_PERS = 10
 
@@ -102,7 +102,7 @@ MAX_PERS_SIZE_Y = 150
 
 MIN_PERS_SIZE_X = 5
 MIN_PERS_SIZE_Y = 10
-'''
+
 
 
 #FRAME LIMITS (KILLING ZONE)
@@ -116,4 +116,5 @@ ALPHA = 0.5
 
 
 DIR_ZONES = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\zones"
-DIR_ZONES = "/Users/Olivier/GitHub/Retail/chute/zones"
+#DIR_ZONES = "/Users/Olivier/GitHub/Retail/chute/zones"
+DIR_ZONES=""

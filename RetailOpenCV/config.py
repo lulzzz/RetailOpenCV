@@ -23,8 +23,9 @@ to_be_sent = []
 
 #API configuration
 API_GET_CAM_ID = ""
-API_POST_RESULTS = "cargo-hub.azureswebsites.net/api/hublog/notify"
-API_DEBUG = True
+API_POST_RESULTS = "http://cargo-hub.azurewebsites.net/api/hublog/notify"
+API_DEBUG = False
+API_SLEEP_TIME=5
 OUTPUTFILE = fichier = open("out.json", "w")
 
 def get_camera_id():

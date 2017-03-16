@@ -129,9 +129,14 @@ class Person(object):
         else:
             return self.liste_zones[-1][0] 
 
+    def last_zone_id(self):
+        if len(self.liste_zones) == 0:
+            return 0
+        else:
+            return self.liste_zones[-1][2] 
 
-    def add_zone(self, zone, nb_frame):
-        self.liste_zones.append((zone, nb_frame))
+    def add_zone(self, zone, nb_frame, zone_id):
+        self.liste_zones.append((zone, nb_frame, zone_id))
         
     def close_from_borders(self,  video_dim):
         x, y  = self.liste_positions[-1][0]

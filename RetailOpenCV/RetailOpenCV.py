@@ -32,7 +32,7 @@ input_video = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\street\\01\
 
 #input_video = "C:\\Users\\Olivier Staub\\Documents\\ComputerVision_Detect_Body\\videoset\\chute16\\cam2.avi"
 
-input_video = 1
+#input_video = 1
 
 #input_video="C:\\Users\\Olivier Staub\\Pictures\\Camera Roll\\WIN_20170314_17_59_20_Pro.mp4"
 
@@ -67,20 +67,16 @@ class SendDataThread(threading.Thread):
 
     def run(self):
         while not self.stopped():
-            time.sleep(5)
+            time.sleep(cf.API_SLEEP_TIME)
             self.send_data()
             
-
     def stop(self):
         self._stop.set()
         print("Thread stopping...")
         self.send_data()
         
-        
     def stopped(self):
         return self._stop.isSet()
-
-    
 
     def send_data(self):
         if len(cf.to_be_sent) > 0:
@@ -92,14 +88,12 @@ class SendDataThread(threading.Thread):
             # enters zone: 2
             # exits zone: 3
             
-            
             data = {}
             data['timestamp'] = tl.time()
             data['logs'] = []
             data['debug'] = cf.API_DEBUG
             #data['camera_id'] = cf.CAMERA_ID
             
-
             for p in cf.to_be_sent:
                 temp = {}
                 temp['subjectId'] = p[0]
@@ -108,35 +102,32 @@ class SendDataThread(threading.Thread):
                 temp['timestamp'] = p[3]
 
                 data['logs'].append(temp)
-            
-            '''
-            data = []
-            #data['camera_id'] = cf.CAMERA_ID
-            
 
-            for p in cf.to_be_sent:
-                temp = {}
-                temp['person'] = p[0]
-                temp['event'] = p[1]
-                temp['zone'] = p[2]
-                temp['timestamp'] = p[3]
-
-                data.append(temp)
-            '''
-
+            print("API {} items sent".format(len(cf.to_be_sent)))
             #print(json.dumps(data))
             
-            tl.post_results(data)
-            #print('send data')
-            print("API {} items sent".format(len(cf.to_be_sent)))
-            cf.to_be_sent = []
-            #API POST
-            '''
-            if (post_results(data))
+            if (self.post_results(data)):
                 cf.to_be_sent = []
+
+
+    def post_results(self, data):
+        send_json = json.dumps(data)
+        cf.OUTPUTFILE.write("\n"+send_json)
+                
+        headers = {'Content-type':'application/json'}
+        try:
+            res = requests.post(cf.API_POST_RESULTS, data=send_json, headers=headers)
+            if res.status_code == 200:
+                print("\nAPI Status 200 response: {}\n".format(res.text))
+                return True
             else:
-                print('An error occured while sendind the data')
-            '''
+                print("API Status Response {}".format(res.status_code))
+                print("API Response: {}".format(res.text))
+        except Exception as e:
+            msg = "Exception in post request:\n %s \n" % e
+            print(msg)
+        
+
             
 def print_annotation(frame, VideoSource, persons, backup, zones):
 

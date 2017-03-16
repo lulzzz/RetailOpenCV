@@ -78,9 +78,9 @@ class Zones(object):
 		for m in self.masks:
 			for cnt in m[1]:
 				if (cv2.pointPolygonTest(cnt, position, False)==True):
-					return m[0]
+					return m[0], m[3]
 		#Neutral zone has ID 1
-		return 1
+		return 1, 1
 
 
 	def inc_in(self, zone_name):

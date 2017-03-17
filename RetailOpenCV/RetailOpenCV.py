@@ -22,42 +22,6 @@ import os
 from multiprocessing import Process, TimeoutError
 
 
-#input_video = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute10\\cam2.avi"
-
-input_video = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\street\\01\\street960.mp4"
-
-#input_video = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute22\\cam2.avi"
-
-
-
-#input_video = "C:\\Users\\Olivier Staub\\Documents\\ComputerVision_Detect_Body\\videoset\\chute16\\cam2.avi"
-
-#input_video = 1
-
-#input_video="C:\\Users\\Olivier Staub\\Pictures\\Camera Roll\\WIN_20170314_17_59_20_Pro.mp4"
-
-#input_video = "C:\\Users\\Olivier Staub\\Documents\\footage\\ex1.mp4"
-#input_video = "C:\\Users\\Olivier Staub\\Documents\\footage\\cafet.MOV"
-#input_video = "C:\\Users\\Olivier Staub\\Documents\\footage\\cafet2.mp4"
-#input_video = "C:\\Users\\Olivier Staub\\Documents\\footage\\foot1.mp4"
-
-
-#input_video="C:\\Users\\Olivier\\Documents\\retail\\footage\\cafet2.mp4"
-#input_video="C:\\Users\\Olivier\\Documents\\retail\\footage\\cafet.mov"
-
-
-#input_video="C:\\Users\\Olivier\\Documents\\retail\\street\\01\\street960.mp4"
-
-
-#input_video="C:\\Users\\Olivier\\Documents\\retail\\chute\\23\\cam2.avi"
-#input_video="C:\\Users\\Olivier\\Documents\\retail\\chute\\02\\cam2.avi"
-#input_video="C:\\Users\\Olivier\\Documents\\retail\\chute\\14\\cam3.avi"
-
-
-#input_video = "/Users/Olivier/GitHub/Retail/chute/01/cam8.avi"
-#input_video = "/Users/Olivier/GitHub/Retail/footage/cafet2.mp4"
-
-
 
 class SendDataThread(threading.Thread):
     def __init__(self): 
@@ -104,7 +68,7 @@ class SendDataThread(threading.Thread):
                 data['logs'].append(temp)
             
             if cf.SEND_DATA:
-                print("API sending {} items".format(len(cf.to_be_sent)))
+                print("API debug {} sending {} items".format(cf.API_DEBUG, len(cf.to_be_sent)))
                 if (self.post_results(data)):
                     cf.to_be_sent = []
 
@@ -112,7 +76,6 @@ class SendDataThread(threading.Thread):
     def post_results(self, data):
         send_json = json.dumps(data)
         cf.OUTPUTFILE.write("\n"+send_json)
-                
         headers = {'Content-type':'application/json'}
         try:
             res = requests.post(cf.API_POST_RESULTS, data=send_json, headers=headers)
@@ -151,7 +114,8 @@ def print_annotation(frame, VideoSource, persons, backup, zones):
         
     return temp
 
-def draw_general_infos(VideoSource, frame_annotation, zones):
+
+def draw_config(VideoSource, frame_annotation, zones):
     #show config distance and size at the bottom of the frame
     '''
     cv2.line(frame_annotation, (4, int(VideoSource.new_size[1])), (4, int(VideoSource.new_size[1])-cf.MIN_PERS_SIZE_Y),  (0,0,255),1)
@@ -162,7 +126,15 @@ def draw_general_infos(VideoSource, frame_annotation, zones):
     cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-8), (cf.MAX_PERS_SIZE_X, int(VideoSource.new_size[1])-8), (0,255,0),1)
     cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-12), (cf.MAX_DIST_CENTER_X, int(VideoSource.new_size[1])-12), (255,0,0), 1)
     '''
-     
+    '''
+    for x in range(logo.shape[0]):
+        for y in range(logo.shape[1]):
+            if logo[x,y][3] != 0:
+                #print(frame_annotation[x, y])
+                #x = (logo[x,y][0], logo[x,y][1], logo[x,y][2])
+                #print(x)
+                frame_annotation[x, y] = (logo[x,y][0], logo[x,y][1], logo[x,y][2])
+    '''
     #recording dot
     cv2.circle(frame_annotation, (int(VideoSource.new_size[0])-16, 15), 6, (0,255,0), -1)
 
@@ -173,7 +145,6 @@ def draw_general_infos(VideoSource, frame_annotation, zones):
     cv2.line(frame_annotation, (0, cf.DEAD_ZONE_Y), (int(VideoSource.new_size[0]), cf.DEAD_ZONE_Y), (255, 255, 0), 1)
     cv2.line(frame_annotation, (0, int(VideoSource.new_size[1]) - cf.DEAD_ZONE_Y), (int(VideoSource.new_size[0]), int(VideoSource.new_size[1]) - cf.DEAD_ZONE_Y), (255, 255, 0), 1)
     '''
-
 
 def draw_zones(zones, frame_annotation):
     if zones.nb_zones() > 0:
@@ -190,7 +161,6 @@ def draw_zones(zones, frame_annotation):
             cv2.putText(frame_annotation, str(m[3]), (x, y+48), cf.FONT, 2, m[2][0], 3)
             cv2.putText(frame_annotation, str(m[3]), (x, y+48), cf.FONT, 2, (255,255,255), 1)
 
-
 def draw_persons(persons, VideoSource, frame_annotation, frame_annotation_copy):
             
     #check among the persons we have registered, which are currently on the frame so we can draw informations about them
@@ -203,13 +173,9 @@ def draw_persons(persons, VideoSource, frame_annotation, frame_annotation_copy):
                     
             #draw the contours we have of that person on that frame
             cv2.drawContours(frame_annotation, per.contour_last_frame(VideoSource.nb_frame), -1, per.couleur_dark, 1)
-
             overlay = frame_annotation.copy()
-
             cv2.drawContours(overlay, [per.contour_last_frame(VideoSource.nb_frame)[0]], 0, per.couleur_dark, -1)
-
             cv2.addWeighted(overlay, cf.ALPHA, frame_annotation_copy, 1 - cf.ALPHA, 0, frame_annotation)
-
             cv2.drawContours(frame_annotation, [per.contour_last_frame(VideoSource.nb_frame)[0]], 0, per.couleur_dark, 2)
 
             #obtain current person's bounding box in order to draw on the displayed frame
@@ -221,12 +187,68 @@ def draw_persons(persons, VideoSource, frame_annotation, frame_annotation_copy):
             
             previous_pos = (0,0)
             
-            for i,p in enumerate(per.liste_positions):
+            for i,p in enumerate(per.liste_positions[-100:]):
                 if (i>0):
                     cv2.line(frame_annotation, previous_pos, p[0], per.couleur, 2)
                 previous_pos = p[0]
             
+def generate_border(VideoSource, logo,  persons, backup, zones, name_source):
+    temp = np.ones((48,int(VideoSource.new_size[0]), 3), np.uint8)
+    temp[:,:] = (255,255,255)
 
+    nb_line = 2
+    nb_column = 5
+
+    width_printing_area = temp.shape[1]-logo.shape[1]
+    width_column = int(width_printing_area / nb_column)
+    height_line = 18
+
+    lines = []
+    lines.append((name_source.title(),  cf.BORDER_TEXT_COLOR))
+    lines.append((str(int(VideoSource.new_size[0]))+"x"+str(int(VideoSource.new_size[1])), cf.BORDER_TEXT_COLOR))
+    lines.append(("Frame {}/{}".format(str(VideoSource.nb_frame), str(int(VideoSource.nb_total_frame))), cf.BORDER_TEXT_COLOR))
+    lines.append(("FPS "+str(round(VideoSource.nb_frame/(time.time()-cf.T_START),2)), cf.BORDER_TEXT_COLOR))
+    lines.append(("{} alive".format(len(persons)), cf.BORDER_TEXT_COLOR))
+    lines.append(("{} dead".format(len(backup)), cf.BORDER_TEXT_COLOR))
+
+    for z in zones.masks:
+        lines.append(("{}: {} items".format(z[3], zones.count["entries"][z[0]] - zones.count["exits"][z[0]]), z[2][1]))
+
+    for i,t in enumerate(lines):
+        cv2.putText(temp, t[0], (width_column*(i/nb_line),height_line*((i%nb_line)+1)), cf.FONT, 0.5, t[1], 1)
+
+    temp[0:logo.shape[0], temp.shape[1]-logo.shape[1]:int(VideoSource.new_size[0])] = logo
+
+    return temp 
+
+def assemble_frame_border(frame, border):
+    temp = np.ones((frame.shape[0]+border.shape[0], frame.shape[1], 3), np.uint8)
+    temp[:,:] = (255,255,255)
+    temp[0:frame.shape[0], 0:frame.shape[1]] = frame
+
+    temp[frame.shape[0]:frame.shape[0]+48, 0:border.shape[1]] = border
+
+
+    return temp
+
+def draw_init_frame(VideoSource, frame, init_file):
+    
+    temp = np.ones((int(VideoSource.new_size[1]),int(VideoSource.new_size[0]), 3), np.uint8)
+    temp[:,:] = (0,0,0)
+
+    x = int(VideoSource.new_size[0]/2 - init_file.shape[1] / 2)
+    y = int(VideoSource.new_size[1]/2 - init_file.shape[0] / 2)
+    w = init_file.shape[1]
+    h = init_file.shape[0]
+
+    temp[y:y+h, x:x+w] = init_file
+
+    alpha = 0.2
+
+    cv2.addWeighted(frame, alpha, temp, 1 - alpha, 0, frame)
+
+
+    
 
 def main():
 
@@ -239,12 +261,16 @@ def main():
     #initialisation
     
     #video source
+    input_video = cf.VIDEO_SOURCE
     VideoSource = Source(input_video)
 
     if(input_video==0)|(input_video==1):
-        print("Source: Webcam")
+        name_source = "Webcam"
     else:
-        print("Source: {}".format(os.path.basename(input_video)))
+        name_source = os.path.basename(input_video)
+
+    
+    print("Source: {}".format(name_source))
 
     camera = cv2.VideoCapture(input_video)
     #background substraction tools
@@ -266,7 +292,10 @@ def main():
     zones = Zones(input_video, VideoSource.new_size)
 
     cv2.namedWindow('Tracking', cv2.WINDOW_NORMAL)	
-    cv2.resizeWindow('Tracking', int(VideoSource.new_size[0]), int(VideoSource.new_size[1]))
+    cv2.resizeWindow('Tracking', int(VideoSource.new_size[0]), int(VideoSource.new_size[1])+48)
+
+    logo_file = cv2.imread(cf.LOGO_FILE)
+    init_file = cv2.imread(cf.INIT_FILE)
 
     #main loop
     print("Start training background detection")
@@ -310,7 +339,8 @@ def main():
         
         #prepare the frame to be displayed
         #t['draw_annotation'] = time.time()
-        frame_annotation = print_annotation(frame, VideoSource, persons, backup_dead_persons, zones)
+        #frame_annotation = print_annotation(frame, VideoSource, persons, backup_dead_persons, zones)
+        frame_annotation = frame
         #t['a_draw_annotation'] = time.time()
 
         #wait TRAIN_FRAMES frames to train the background
@@ -399,7 +429,7 @@ def main():
             #draw general information
             #frame_annotation_copy = frame_annotation.copy()
             #t['draw_general'] = time.time()
-            draw_general_infos(VideoSource, frame_annotation, zones)
+            #draw_config(VideoSource, frame_annotation, zones)
             #t['a_draw_general'] = time.time()
 
             #draw detection zone on the frame
@@ -413,6 +443,11 @@ def main():
             #t['a_draw_persons'] = time.time()
 
 
+        else:
+            draw_init_frame(VideoSource, frame_annotation, init_file)
+
+        border = generate_border(VideoSource, logo_file, persons, backup_dead_persons, zones, name_source)
+        frame_annotation = assemble_frame_border(frame_annotation, border)
 
 
         #display the frame

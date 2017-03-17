@@ -5,29 +5,102 @@ from random import randint
 import os
 import time
 
+
+
 '''
 '
-'  CONFIG DATA
+'  VIDEO SOURCE
 '
 '''
+
+VIDEO_SOURCE = 0
+
+#VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute10\\cam2.avi"
+
+VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\street\\01\\street960.mp4"
+
+#VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute22\\cam2.avi"
+
+
+
+#VIDEO_SOURCE = "C:\\Users\\Olivier Staub\\Documents\\ComputerVision_Detect_Body\\videoset\\chute16\\cam2.avi"
+
+#VIDEO_SOURCE = 1
+
+#VIDEO_SOURCE="C:\\Users\\Olivier Staub\\Pictures\\Camera Roll\\WIN_20170314_17_59_20_Pro.mp4"
+
+#VIDEO_SOURCE = "C:\\Users\\Olivier Staub\\Documents\\footage\\ex1.mp4"
+#VIDEO_SOURCE = "C:\\Users\\Olivier Staub\\Documents\\footage\\cafet.MOV"
+#VIDEO_SOURCE = "C:\\Users\\Olivier Staub\\Documents\\footage\\cafet2.mp4"
+#VIDEO_SOURCE = "C:\\Users\\Olivier Staub\\Documents\\footage\\foot1.mp4"
+
+
+#VIDEO_SOURCE="C:\\Users\\Olivier\\Documents\\retail\\footage\\cafet2.mp4"
+#VIDEO_SOURCE="C:\\Users\\Olivier\\Documents\\retail\\footage\\cafet.mov"
+
+
+#VIDEO_SOURCE="C:\\Users\\Olivier\\Documents\\retail\\street\\01\\street960.mp4"
+
+
+#VIDEO_SOURCE="C:\\Users\\Olivier\\Documents\\retail\\chute\\23\\cam2.avi"
+#VIDEO_SOURCE="C:\\Users\\Olivier\\Documents\\retail\\chute\\02\\cam2.avi"
+#VIDEO_SOURCE="C:\\Users\\Olivier\\Documents\\retail\\chute\\14\\cam3.avi"
+
+
+#VIDEO_SOURCE = "/Users/Olivier/GitHub/Retail/chute/01/cam8.avi"
+#VIDEO_SOURCE = "/Users/Olivier/GitHub/Retail/footage/cafet2.mp4"
+
+
+
+
+
+'''
+'
+'  ZONES DIRECTORY
+'
+'''
+
+DIR_ZONES = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\zones"
+DIR_ZONES = "C:\\Users\\Olivier-Laforge\\Documents\\GitHub\\RetailOpenCV\\dataset\\zones"
+#DIR_ZONES = "/Users/Olivier/GitHub/Retail/chute/zones"
+#DIR_ZONES=""
+
+#DIR_ZONES = "C:\\Users\\Olivier\\Documents\\retail\\RetailOpenCV\\dataset\\zones"
+
+
+
+'''
+'
+'  API CONFIG
+'
+'''
+
+SEND_DATA = False
+API_GET_CAM_ID = ""
+API_POST_RESULTS = "http://cargo-hub.azurewebsites.net/api/hublog/notify"
+API_DEBUG = True
+API_SLEEP_TIME=5
+OUTPUTFILE = open("out.json", "w")
+
+LOGO_FILE = "logo.png"
+INIT_FILE = "init.png"
+
+
+
 
 #donnee generales partagees
 
 T_START = time.time()
 
 FONT = cv2.FONT_HERSHEY_SIMPLEX
+
 ANOTATION_COLOR = (0,255,0)
+BORDER_BACKGROUND_COLOR = (0,0,0)
+BORDER_TEXT_COLOR = (0,0,0  )
 
 to_be_sent = []
 
 
-#API configuration
-SEND_DATA = False
-API_GET_CAM_ID = ""
-API_POST_RESULTS = "http://cargo-hub.azurewebsites.net/api/hublog/notify"
-API_DEBUG = False
-API_SLEEP_TIME=5
-OUTPUTFILE = fichier = open("out.json", "w")
 
 def get_camera_id():
     '''
@@ -74,7 +147,6 @@ MIN_PERS_SIZE = 50
 '''
 
 
-
 ''' Chutes Config '''
 '''
 CNT_MIN = 30
@@ -117,10 +189,4 @@ NO_SEE_FRAMES_BEFORE_DEATH = 100
 ALPHA = 0.5
 
 
-DIR_ZONES = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\zones"
-DIR_ZONES = "C:\\Users\\Olivier-Laforge\\Documents\\GitHub\\RetailOpenCV\\dataset\\zones"
-#DIR_ZONES = "/Users/Olivier/GitHub/Retail/chute/zones"
-#DIR_ZONES=""
-
-#DIR_ZONES = "C:\\Users\\Olivier\\Documents\\retail\\RetailOpenCV\\dataset\\zones"
     

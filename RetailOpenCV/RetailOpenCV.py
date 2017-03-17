@@ -46,7 +46,7 @@ input_video = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\street\\01\
 #input_video="C:\\Users\\Olivier\\Documents\\retail\\footage\\cafet.mov"
 
 
-input_video="C:\\Users\\Olivier\\Documents\\retail\\street\\01\\street960.mp4"
+#input_video="C:\\Users\\Olivier\\Documents\\retail\\street\\01\\street960.mp4"
 
 
 #input_video="C:\\Users\\Olivier\\Documents\\retail\\chute\\23\\cam2.avi"
@@ -102,12 +102,11 @@ class SendDataThread(threading.Thread):
                 temp['timestamp'] = p[3]
 
                 data['logs'].append(temp)
-
-            print("API {} items sent".format(len(cf.to_be_sent)))
-            #print(json.dumps(data))
             
-            #if (self.post_results(data)):
-            cf.to_be_sent = []
+            if cf.SEND_DATA:
+                print("API sending {} items".format(len(cf.to_be_sent)))
+                if (self.post_results(data)):
+                    cf.to_be_sent = []
 
 
     def post_results(self, data):
@@ -128,14 +127,13 @@ class SendDataThread(threading.Thread):
             print(msg)
         
 
-            
 def print_annotation(frame, VideoSource, persons, backup, zones):
 
     lignes = []
     temp = copy(frame)
         
     #if self.display_frame_dim:
-    #lignes.append(str(int(VideoSource.new_size[0]))+"x"+str(int(VideoSource.new_size[1])))
+    lignes.append(str(int(VideoSource.new_size[0]))+"x"+str(int(VideoSource.new_size[1])))
 
     #if self.display_frame_number:
     lignes.append("Frame {}/{}".format(str(VideoSource.nb_frame), str(int(VideoSource.nb_total_frame))))
@@ -222,27 +220,17 @@ def draw_persons(persons, VideoSource, frame_annotation, frame_annotation_copy):
             cv2.circle(frame_annotation, per.position_last_frame(VideoSource.nb_frame), 4, per.couleur, -1)
             
             previous_pos = (0,0)
-            '''
+            
             for i,p in enumerate(per.liste_positions):
                 if (i>0):
                     cv2.line(frame_annotation, previous_pos, p[0], per.couleur, 2)
                 previous_pos = p[0]
-            '''
             
-    '''
-
-    persons_dead = [p for p in persons if not p.alive]
-
-    if len(persons_dead) > 0:
-        for per in persons_dead:
-            cv2.drawContours(frame_annotation, per.contour_last_frame(VideoSource.nb_frame), -1, (255,255,255), 1)
-    '''
-
 
 
 def main():
 
-    raw_input("Press any key to begin...")
+    raw_input("Press enter to begin...")
                
 
     #cv2.setUseOptimized(True)
@@ -429,13 +417,7 @@ def main():
 
         #display the frame
         #cv2.imshow('Forground detection',forground)
-        '''
-        window_aspect_ratio = cv2.getWindowProperty('frameshow', 2)
-        frame_aspect_ratio = VideoSource.new_size[0]/VideoSource.new_size[1]
-        
-        if window_aspect_ratio != frame_aspect_ratio:
-            cv2.setWindowProperty('frameshow', 2, frame_aspect_ratio)
-        '''
+
         cv2.imshow('Tracking',frame_annotation)
 
         #print("FRAME "+str(VideoSource.nb_frame)+" "+str(round(VideoSource.nb_frame/(time.time()-cf.T_START)))+" FPS")  

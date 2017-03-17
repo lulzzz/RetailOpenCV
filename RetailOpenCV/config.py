@@ -22,6 +22,7 @@ to_be_sent = []
 
 
 #API configuration
+SEND_DATA = False
 API_GET_CAM_ID = ""
 API_POST_RESULTS = "http://cargo-hub.azurewebsites.net/api/hublog/notify"
 API_DEBUG = False
@@ -117,8 +118,9 @@ ALPHA = 0.5
 
 
 DIR_ZONES = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\zones"
+DIR_ZONES = "C:\\Users\\Olivier-Laforge\\Documents\\GitHub\\RetailOpenCV\\dataset\\zones"
 #DIR_ZONES = "/Users/Olivier/GitHub/Retail/chute/zones"
-DIR_ZONES=""
+#DIR_ZONES=""
 
-DIR_ZONES = "C:\\Users\\Olivier\\Documents\\retail\\RetailOpenCV\\dataset\\zones"
+#DIR_ZONES = "C:\\Users\\Olivier\\Documents\\retail\\RetailOpenCV\\dataset\\zones"
     

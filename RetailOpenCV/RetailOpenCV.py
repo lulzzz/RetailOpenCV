@@ -429,7 +429,7 @@ def main():
             #draw general information
             #frame_annotation_copy = frame_annotation.copy()
             #t['draw_general'] = time.time()
-            #draw_config(VideoSource, frame_annotation, zones)
+            draw_config(VideoSource, frame_annotation, zones)
             #t['a_draw_general'] = time.time()
 
             #draw detection zone on the frame

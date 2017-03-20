@@ -130,12 +130,13 @@ def draw_config(VideoSource, frame_annotation, zones):
     cv2.circle(frame_annotation, (int(VideoSource.new_size[0])-16, 15), 6, (0,255,0), -1)
 
     #dead zones
-    
+    '''
     cv2.line(frame_annotation, ( cf.DEAD_ZONE_X, 0), (cf.DEAD_ZONE_X, int(VideoSource.new_size[1])), (255,255, 0), 1)
     cv2.line(frame_annotation, ( int(VideoSource.new_size[0]) - cf.DEAD_ZONE_X, 0), ( int(VideoSource.new_size[0]) - cf.DEAD_ZONE_X, int(VideoSource.new_size[1])), (255,255, 0), 1)
     cv2.line(frame_annotation, (0, cf.DEAD_ZONE_Y), (int(VideoSource.new_size[0]), cf.DEAD_ZONE_Y), (255, 255, 0), 1)
     cv2.line(frame_annotation, (0, int(VideoSource.new_size[1]) - cf.DEAD_ZONE_Y), (int(VideoSource.new_size[0]), int(VideoSource.new_size[1]) - cf.DEAD_ZONE_Y), (255, 255, 0), 1)
-    
+    '''
+
 def draw_zones(zones, frame_annotation):
     if zones.nb_zones() > 0:
         overlay = frame_annotation.copy()
@@ -369,7 +370,6 @@ def main():
             contours,hierarchy = cv2.findContours( temp_recherche_contour, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
             #t['a_find_contours'] = time.time()
 
-
             #init liste that contains the probable persons detected on the frame
             temp_persons_detected_on_current_frame = []
             
@@ -395,7 +395,7 @@ def main():
                 #only keep the bigger contours (for noise removal)
                 contours = [c for c in cnt_approx if cv2.contourArea(c)>cf.CNT_MIN]
 
-
+                
                 #if there are still some contours big enough present on the frame
                 if len(contours) > 0:
 
@@ -405,17 +405,18 @@ def main():
 
                     #try to detect groups on contours that could be persons on the frame
                     previous_len_cnt = 0                    
-                    while (len(contours)>0) & previous_len_cnt < len(contours):
-
+                    while len(contours) > 0 & previous_len_cnt < len(contours):
                         #t['search_persons_on_frame'] = time.time()
-                        res, l = (tl.search_person_on_frame(contours))
+                        res, l = tl.search_person_on_frame(contours)
                         #t['a_search_persons_on_frame'] = time.time()
 
-                        if (res==1):
+                        if (res == True):
                             temp_persons_detected_on_current_frame.append(l)
                         previous_len_cnt = len(contours)
 
                     if (len(temp_persons_detected_on_current_frame)>0)&(len(temp_persons_detected_on_current_frame)<30):
+                        
+
                         #when possible persons are identified on the frame, try to track them, ie associate these persons with the ones already registered
                         #t['update_persons'] = time.time()
                         tl.update_persons(persons, VideoSource.nb_frame, temp_persons_detected_on_current_frame)
@@ -461,7 +462,7 @@ def main():
 
 
         #display the frame
-        cv2.imshow('Forground detection',forground)
+        #cv2.imshow('Forground detection',forground)
 
         cv2.imshow('Tracking',frame_annotation)
 

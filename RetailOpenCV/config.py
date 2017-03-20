@@ -23,7 +23,7 @@ VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\street\\01
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute22\\cam2.avi"
 
-VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\GitHub\\RetailOpenCV\\dataset\\lego\\04\\lego960.mp4"
+VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\GitHub\\RetailOpenCV\\dataset\\lego\\04\lego960.mp4"
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier Staub\\Documents\\ComputerVision_Detect_Body\\videoset\\chute16\\cam2.avi"
 
@@ -111,7 +111,7 @@ FONT = cv2.FONT_HERSHEY_SIMPLEX
 
 ANOTATION_COLOR = (0,255,0)
 BORDER_BACKGROUND_COLOR = (0,0,0)
-BORDER_TEXT_COLOR = (0,0,0  )
+BORDER_TEXT_COLOR = (0,0,0)
 
 to_be_sent = []
 
@@ -188,12 +188,12 @@ MIN_PERS_SIZE_X = 30
 MIN_PERS_SIZE_Y = 50
 '''
 
-''' Lego Config '''
+''' Street Config '''
+'''
+CNT_MIN = 5
+MIN_SIZE_CNT_PERS = 5
 
-CNT_MIN = 20
-MIN_SIZE_CNT_PERS = 20
-
-MAX_DIST_CENTER_X = 60
+MAX_DIST_CENTER_X = 75
 MAX_DIST_CENTER_Y = 30
 
 MAX_PERS_SIZE_X = 220
@@ -201,8 +201,22 @@ MAX_PERS_SIZE_Y = 150
 
 MIN_PERS_SIZE_X = 5
 MIN_PERS_SIZE_Y = 10
+'''
 
 
+''' Lego Config '''
+
+CNT_MIN = 10
+MIN_SIZE_CNT_PERS = 10
+
+MAX_DIST_CENTER_X = 80
+MAX_DIST_CENTER_Y = 80
+
+MAX_PERS_SIZE_X = 180
+MAX_PERS_SIZE_Y = 180
+
+MIN_PERS_SIZE_X = 25
+MIN_PERS_SIZE_Y = 25
 
 ''' Live config '''
 

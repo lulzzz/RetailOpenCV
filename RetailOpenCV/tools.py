@@ -98,18 +98,12 @@ def distance(pt1, pt2):
 def search_person_on_frame(contours):
        
     res_temp = []
-        
-    #if cv2.contourArea(contours[0]) > cf.MIN_SIZE_CNT:
-        
     ref = copy(contours[0])
-
     temp = copy(contours)
-    contours.remove(contours[0])
-    cnt_approx = []
-                           
-    #get biggest area detected
+    contours.pop(0)
+    #contours.remove(contours[0])
+
     centre_ref = center_contour(ref)
-                            
     res_temp.append(ref)
 
     for i,c in enumerate(temp):
@@ -137,13 +131,11 @@ def search_person_on_frame(contours):
                     if (height > cf.MIN_PERS_SIZE_Y) & (height < cf.MAX_PERS_SIZE_Y):
                         #if no consider the contour as part of the person
                         res_temp.append(copy(c))
-
                         for j,cnt in enumerate(contours):
                             if len(cnt) == len(c):
                                 if (cnt == c).all():            
                                     contours.pop(j)
                                     break
-    
     
     x_min = min([xmin(c) for c in res_temp])
     x_max = max([xmax(c) for c in res_temp])

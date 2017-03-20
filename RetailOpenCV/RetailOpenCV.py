@@ -3,6 +3,7 @@
 import numpy as np
 import cv2
 import config as cf
+import arg_parser as parse
 import tools as tl
 #import cython_tools as ctl
 from datetime import datetime
@@ -116,7 +117,7 @@ def print_annotation(frame, VideoSource, persons, backup, zones):
 
 def draw_config(VideoSource, frame_annotation, zones):
     #show config distance and size at the bottom of the frame
-    '''
+    
     cv2.line(frame_annotation, (4, int(VideoSource.new_size[1])), (4, int(VideoSource.new_size[1])-cf.MIN_PERS_SIZE_Y),  (0,0,255),1)
     cv2.line(frame_annotation, (8, int(VideoSource.new_size[1])), (8, int(VideoSource.new_size[1])-cf.MAX_PERS_SIZE_Y), (0,255,0),1)
     cv2.line(frame_annotation, (12, int(VideoSource.new_size[1])), (12, int(VideoSource.new_size[1])-cf.MAX_DIST_CENTER_Y), (255,0,0), 1)
@@ -124,26 +125,17 @@ def draw_config(VideoSource, frame_annotation, zones):
     cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-4), (cf.MIN_PERS_SIZE_X, int(VideoSource.new_size[1])-4), (0,0,255),1)
     cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-8), (cf.MAX_PERS_SIZE_X, int(VideoSource.new_size[1])-8), (0,255,0),1)
     cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-12), (cf.MAX_DIST_CENTER_X, int(VideoSource.new_size[1])-12), (255,0,0), 1)
-    '''
-    '''
-    for x in range(logo.shape[0]):
-        for y in range(logo.shape[1]):
-            if logo[x,y][3] != 0:
-                #print(frame_annotation[x, y])
-                #x = (logo[x,y][0], logo[x,y][1], logo[x,y][2])
-                #print(x)
-                frame_annotation[x, y] = (logo[x,y][0], logo[x,y][1], logo[x,y][2])
-    '''
+    
     #recording dot
     cv2.circle(frame_annotation, (int(VideoSource.new_size[0])-16, 15), 6, (0,255,0), -1)
 
     #dead zones
-    '''
+    
     cv2.line(frame_annotation, ( cf.DEAD_ZONE_X, 0), (cf.DEAD_ZONE_X, int(VideoSource.new_size[1])), (255,255, 0), 1)
     cv2.line(frame_annotation, ( int(VideoSource.new_size[0]) - cf.DEAD_ZONE_X, 0), ( int(VideoSource.new_size[0]) - cf.DEAD_ZONE_X, int(VideoSource.new_size[1])), (255,255, 0), 1)
     cv2.line(frame_annotation, (0, cf.DEAD_ZONE_Y), (int(VideoSource.new_size[0]), cf.DEAD_ZONE_Y), (255, 255, 0), 1)
     cv2.line(frame_annotation, (0, int(VideoSource.new_size[1]) - cf.DEAD_ZONE_Y), (int(VideoSource.new_size[0]), int(VideoSource.new_size[1]) - cf.DEAD_ZONE_Y), (255, 255, 0), 1)
-    '''
+    
 
 def draw_zones(zones, frame_annotation):
     if zones.nb_zones() > 0:
@@ -184,14 +176,15 @@ def draw_persons(persons, VideoSource, frame_annotation, frame_annotation_copy):
             #draw current person's position on the frame
             cv2.circle(frame_annotation, per.position_last_frame(VideoSource.nb_frame), 3, per.couleur, -1)
             
-            previous_pos = (0,0)
-            
-            for i,p in enumerate(per.liste_positions[-100:]):
-                if (i>0):
-                    cv2.line(frame_annotation, previous_pos, p[0], per.couleur, 2, cv2.CV_AA)
-                previous_pos = p[0]
-                
 
+            if cf.DRAW_PERSON_PATH_TAIL:
+                previous_pos = (0,0)
+            
+                for i,p in enumerate(per.liste_positions[-cf.DRAW_PERSON_PATH_TAIL_LENGTH:]):
+                    if (i>0):
+                        cv2.line(frame_annotation, previous_pos, p[0], per.couleur, 2, cv2.CV_AA)
+                    previous_pos = p[0]
+               
 def generate_border(VideoSource, logo,  persons, backup, zones, name_source):
     temp = np.ones((48,int(VideoSource.new_size[0]), 3), np.uint8)
     temp[:,:] = (255,255,255)
@@ -249,7 +242,6 @@ def draw_init_frame(VideoSource, frame, init_file):
 
 
 def main():
-
     raw_input("Press enter to begin...")
                
 
@@ -259,13 +251,30 @@ def main():
     #initialisation
     
     #video source
-    input_video = cf.VIDEO_SOURCE
-    VideoSource = Source(input_video)
+    args = parse.parser()
+
+    if args.input:
+        if args.input == "0":
+            input_video = 0
+        elif args.input == "1":
+            input_video = 1
+        else:
+            input_video = args.input
+
+    else:
+        input_video = cf.VIDEO_SOURCE
+
+
 
     if(input_video==0)|(input_video==1):
         name_source = "Webcam"
     else:
         name_source = os.path.basename(input_video)
+
+
+    VideoSource = Source(input_video)
+
+
 
     
     print("Source: {}".format(name_source))
@@ -427,17 +436,20 @@ def main():
             #draw general information
             #frame_annotation_copy = frame_annotation.copy()
             #t['draw_general'] = time.time()
-            draw_config(VideoSource, frame_annotation, zones)
+            if cf.DRAW_CONFIG:
+                draw_config(VideoSource, frame_annotation, zones)
             #t['a_draw_general'] = time.time()
 
             #draw detection zone on the frame
             #t['draw_zones'] = time.time()
-            draw_zones(zones, frame_annotation)
+            if cf.DRAW_ZONES:
+                draw_zones(zones, frame_annotation)
             #t['a_draw_zones'] = time.time()
 
             #draw the detected persons on the frame
             #t['draw_persons'] = time.time()
-            draw_persons(persons, VideoSource, frame_annotation, frame_annotation)
+            if cf.DRAW_PERSONS:
+                draw_persons(persons, VideoSource, frame_annotation, frame_annotation)
             #t['a_draw_persons'] = time.time()
 
 
@@ -485,6 +497,7 @@ def main():
     print("{} ms/frame".format(round(((time.time()-cf.T_START)*1000)/float(VideoSource.nb_frame), 2)))
     print("--------------------------")
 
+    print("Persons")
     print("{} persons detected".format(len(persons)+len(backup_dead_persons)))
     print("{} backuped".format(len(backup_dead_persons)))
     '''
@@ -512,7 +525,7 @@ def main():
     
     print("--------------------------")
     '''
-    print("Timings")
+    print("Performances")
 
 
     tot = {}

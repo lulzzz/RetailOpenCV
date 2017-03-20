@@ -25,12 +25,12 @@ class Source(object):
 		print("Original size: {} x {}".format(self.camera.get(3), self.camera.get(4)))
 
 		if (path == 0):
-			self.camera.set(3, 640)
-			self.camera.set(4, 480)
+			self.camera.set(3, cf.SET_WEBCAM_WIDTH)
+			self.camera.set(4, cf.SET_WEBCAM_HEIGHT)
 
 		if (path == 1):
-			self.camera.set(3, 960)
-			self.camera.set(4, 540)
+			self.camera.set(3, cf.SET_WEBCAM_WIDTH)
+			self.camera.set(4, cf.SET_WEBCAM_HEIGHT)
 			
 		self.original_size = self.camera.get(3), self.camera.get(4)
 

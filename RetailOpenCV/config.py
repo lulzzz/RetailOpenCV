@@ -13,13 +13,15 @@ import time
 '
 '''
 
+VIDEO_SOURCE = " http://96.10.1.168/mjpg/video.mjpg"
+
 VIDEO_SOURCE = 0
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute10\\cam2.avi"
 
 VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\street\\01\\street960.mp4"
 
-#VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute22\\cam2.avi"
+VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute22\\cam2.avi"
 
 
 
@@ -50,7 +52,8 @@ VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\street\\01
 #VIDEO_SOURCE = "/Users/Olivier/GitHub/Retail/chute/01/cam8.avi"
 #VIDEO_SOURCE = "/Users/Olivier/GitHub/Retail/footage/cafet2.mp4"
 
-
+SET_WEBCAM_WIDTH = 960
+SET_WEBCAM_HEIGHT = 540
 
 
 
@@ -84,6 +87,18 @@ OUTPUTFILE = open("out.json", "w")
 
 LOGO_FILE = "logo.png"
 INIT_FILE = "init.png"
+
+
+'''
+'
+'  DRAWING CONFIG
+'
+'''
+DRAW_CONFIG = True
+DRAW_ZONES = True
+DRAW_PERSONS = True
+DRAW_PERSON_PATH_TAIL = False
+DRAW_PERSON_PATH_TAIL_LENGTH = 100
 
 
 
@@ -148,23 +163,22 @@ MIN_PERS_SIZE = 50
 
 
 ''' Chutes Config '''
-'''
+
 CNT_MIN = 30
 MIN_SIZE_CNT_PERS = 30
 
 MAX_DIST_CENTER_X = 160
-MAX_DIST_CENTER_Y = 180
+MAX_DIST_CENTER_Y = 210
 
-MAX_PERS_SIZE_X = 260
-MAX_PERS_SIZE_Y = 300
+MAX_PERS_SIZE_X = 280
+MAX_PERS_SIZE_Y = 340
 
-MIN_PERS_SIZE_X = 40
-MIN_PERS_SIZE_Y = 60
-'''
+MIN_PERS_SIZE_X = 30
+MIN_PERS_SIZE_Y = 50
+
 
 ''' Lego Config '''
-
-
+'''
 CNT_MIN = 5
 MIN_SIZE_CNT_PERS = 10
 
@@ -176,7 +190,24 @@ MAX_PERS_SIZE_Y = 150
 
 MIN_PERS_SIZE_X = 5
 MIN_PERS_SIZE_Y = 10
+'''
 
+
+''' Live config '''
+
+'''
+CNT_MIN = 5
+MIN_SIZE_CNT_PERS = 5
+
+MAX_DIST_CENTER_X = 50
+MAX_DIST_CENTER_Y = 50
+
+MAX_PERS_SIZE_X = 300
+MAX_PERS_SIZE_Y = 200
+
+MIN_PERS_SIZE_X = 5
+MIN_PERS_SIZE_Y = 5
+'''
 
 
 #FRAME LIMITS (KILLING ZONE)

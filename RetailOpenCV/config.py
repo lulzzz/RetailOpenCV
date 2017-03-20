@@ -23,7 +23,7 @@ VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\street\\01
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute22\\cam2.avi"
 
-VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\GitHub\\RetailOpenCV\\dataset\\lego\\03\\lego960.mp4"
+VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\GitHub\\RetailOpenCV\\dataset\\lego\\04\\lego960.mp4"
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier Staub\\Documents\\ComputerVision_Detect_Body\\videoset\\chute16\\cam2.avi"
 
@@ -129,7 +129,7 @@ CAMERA_ID = get_camera_id()
 
 #Aquisition
 
-MAX_LONGER_SIDE = 700
+MAX_LONGER_SIDE = 960
 
 #Filled at init source in order to determine limits and min/max sizes
 CURRENT_FRAME_SIZE = 0

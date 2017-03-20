@@ -140,14 +140,15 @@ def draw_zones(zones, frame_annotation):
     if zones.nb_zones() > 0:
         overlay = frame_annotation.copy()
         for m in zones.masks:
-            cv2.drawContours(overlay, m[1], 0, m[2][1], -1)
+            cv2.drawContours(overlay, m[1], -1, m[2][1], -1)
             (x, y, w, h) = tl.bbox(m[1])                    
             section_overlay = overlay[y:y+h, x:x+w] 
             section_frame_annotation = frame_annotation[y:y+h, x:x+w]
             cv2.addWeighted(section_overlay, 0.15, section_frame_annotation, 1 - 0.15, 0, section_frame_annotation)
             frame_annotation[y:y+h, x:x+w] = section_frame_annotation
-            cv2.drawContours(frame_annotation, m[1], 0, m[2][1], 2, cv2.CV_AA)
-            cv2.drawContours(frame_annotation, m[1], 0, (255,255,255), 1, cv2.CV_AA)
+            for c in m[1]:
+                cv2.drawContours(frame_annotation, [c], 0, m[2][1], 2, cv2.CV_AA)
+                cv2.drawContours(frame_annotation, [c], 0, (255,255,255), 1, cv2.CV_AA)
             cv2.putText(frame_annotation, str(m[3]), (x, y+48), cf.FONT, 2, m[2][0], 3, cv2.CV_AA)
             cv2.putText(frame_annotation, str(m[3]), (x, y+48), cf.FONT, 2, (255,255,255), 1, cv2.CV_AA)
 

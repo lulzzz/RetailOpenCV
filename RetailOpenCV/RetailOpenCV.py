@@ -136,7 +136,6 @@ def draw_config(VideoSource, frame_annotation, zones):
     cv2.line(frame_annotation, (0, cf.DEAD_ZONE_Y), (int(VideoSource.new_size[0]), cf.DEAD_ZONE_Y), (255, 255, 0), 1)
     cv2.line(frame_annotation, (0, int(VideoSource.new_size[1]) - cf.DEAD_ZONE_Y), (int(VideoSource.new_size[0]), int(VideoSource.new_size[1]) - cf.DEAD_ZONE_Y), (255, 255, 0), 1)
     
-
 def draw_zones(zones, frame_annotation):
     if zones.nb_zones() > 0:
         overlay = frame_annotation.copy()
@@ -164,17 +163,18 @@ def draw_persons(persons, VideoSource, frame_annotation, frame_annotation_copy):
                     
             #draw the contours we have of that person on that frame
             cv2.drawContours(frame_annotation, per.contour_last_frame(VideoSource.nb_frame), -1, per.couleur_dark, 1, cv2.CV_AA)
+            
             overlay = frame_annotation.copy()
             cv2.drawContours(overlay, [per.contour_last_frame(VideoSource.nb_frame)[0]], 0, per.couleur_dark, -1)
             cv2.addWeighted(overlay, cf.ALPHA, frame_annotation_copy, 1 - cf.ALPHA, 0, frame_annotation)
             cv2.drawContours(frame_annotation, [per.contour_last_frame(VideoSource.nb_frame)[0]], 0, per.couleur_dark, 1, cv2.CV_AA)
-
+            
             #obtain current person's bounding box in order to draw on the displayed frame
             (x,y,w,h) = per.bbox_last_frame(VideoSource.nb_frame)
             cv2.rectangle(frame_annotation,(x, y),(x+w, y+h),per.couleur,2)
                             
             #draw current person's position on the frame
-            cv2.circle(frame_annotation, per.position_last_frame(VideoSource.nb_frame), 3, per.couleur, -1)
+            cv2.circle(frame_annotation, per.position_last_frame(VideoSource.nb_frame), 3, per.couleur, -1, cv2.CV_AA)
             
 
             if cf.DRAW_PERSON_PATH_TAIL:
@@ -242,7 +242,7 @@ def draw_init_frame(VideoSource, frame, init_file):
 
 
 def main():
-    raw_input("Press enter to begin...")
+    #raw_input("Press enter to begin...")
                
 
     #cv2.setUseOptimized(True)
@@ -271,13 +271,12 @@ def main():
     else:
         name_source = os.path.basename(input_video)
 
-
     VideoSource = Source(input_video)
-
-
-
     
     print("Source: {}".format(name_source))
+    
+    cf.apply_config_set(cf.ACTIVE_CONFIG_SET, VideoSource.new_size)
+    
 
     camera = cv2.VideoCapture(input_video)
     #background substraction tools
@@ -461,7 +460,7 @@ def main():
 
 
         #display the frame
-        #cv2.imshow('Forground detection',forground)
+        cv2.imshow('Forground detection',forground)
 
         cv2.imshow('Tracking',frame_annotation)
 
@@ -524,7 +523,7 @@ def main():
     
     
     print("--------------------------")
-    '''
+    
     print("Performances")
 
 
@@ -583,7 +582,7 @@ def main():
     
     print("--------------------------")
     
-    '''
+    
 
     '''
     nb_contours_tot = {'contours':0, 'approx':0}

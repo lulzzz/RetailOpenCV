@@ -209,7 +209,7 @@ def check_for_deaths(zones, persons, new_size, nb_frame, backup):
             if nb_frame - p.last_frame_seen > cf.NO_SEE_FRAMES_BEFORE_DEATH:
                 kill(zones, persons, i, p, nb_frame, backup)
                 print("{} {} {} dies    {} age {}".format(nb_frame, time(), p.puuid, p.last_zone(), p.age))
-            if p.close_from_borders(new_size) & (( nb_frame - p.last_frame_seen) > 5):
+            if p.close_from_borders(new_size) & (( nb_frame - p.last_frame_seen) > cf.NO_SEE_FRAMES_BEFORE_DEATH_BORDERS):
                 kill(zones, persons, i, p, nb_frame, backup)
                 print("{} {} {} dies    {} age {}".format(nb_frame, time(), p.puuid, p.last_zone(), p.age))
         

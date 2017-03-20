@@ -45,8 +45,12 @@ class ForgroundExtraction(object):
                 return self.fgmask
         elif (self._algo == 1)|(self._algo == 2):
             self.fgmask = self.fgbg.apply(frame, learningRate = cf.LR)   
-            self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_OPEN, cf.o_kernel, iterations=1)
-            self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_CLOSE, cf.c_kernel,iterations=1)
+            self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_OPEN, cf.o_kernel, iterations=2)
+            self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_CLOSE, cf.c_kernel,iterations=2)
+            self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_OPEN, cf.o_kernel, iterations=2)
+
+            #self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_OPEN, cf.o_kernel, iterations=2)
+            #self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_CLOSE, cf.c_kernel,iterations=1)
             
             #self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_OPEN, cf.o_kernel, iterations=1)
             return self.fgmask 

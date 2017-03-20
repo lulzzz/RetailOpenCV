@@ -114,7 +114,6 @@ def print_annotation(frame, VideoSource, persons, backup, zones):
         
     return temp
 
-
 def draw_config(VideoSource, frame_annotation, zones):
     #show config distance and size at the bottom of the frame
     '''
@@ -156,10 +155,10 @@ def draw_zones(zones, frame_annotation):
             section_frame_annotation = frame_annotation[y:y+h, x:x+w]
             cv2.addWeighted(section_overlay, 0.15, section_frame_annotation, 1 - 0.15, 0, section_frame_annotation)
             frame_annotation[y:y+h, x:x+w] = section_frame_annotation
-            cv2.drawContours(frame_annotation, m[1], 0, m[2][1], 2)
-            cv2.drawContours(frame_annotation, m[1], 0, (255,255,255), 1)
-            cv2.putText(frame_annotation, str(m[3]), (x, y+48), cf.FONT, 2, m[2][0], 3)
-            cv2.putText(frame_annotation, str(m[3]), (x, y+48), cf.FONT, 2, (255,255,255), 1)
+            cv2.drawContours(frame_annotation, m[1], 0, m[2][1], 2, cv2.CV_AA)
+            cv2.drawContours(frame_annotation, m[1], 0, (255,255,255), 1, cv2.CV_AA)
+            cv2.putText(frame_annotation, str(m[3]), (x, y+48), cf.FONT, 2, m[2][0], 3, cv2.CV_AA)
+            cv2.putText(frame_annotation, str(m[3]), (x, y+48), cf.FONT, 2, (255,255,255), 1, cv2.CV_AA)
 
 def draw_persons(persons, VideoSource, frame_annotation, frame_annotation_copy):
             
@@ -172,26 +171,27 @@ def draw_persons(persons, VideoSource, frame_annotation, frame_annotation_copy):
         for per in persons_to_draw:
                     
             #draw the contours we have of that person on that frame
-            cv2.drawContours(frame_annotation, per.contour_last_frame(VideoSource.nb_frame), -1, per.couleur_dark, 1)
+            cv2.drawContours(frame_annotation, per.contour_last_frame(VideoSource.nb_frame), -1, per.couleur_dark, 1, cv2.CV_AA)
             overlay = frame_annotation.copy()
             cv2.drawContours(overlay, [per.contour_last_frame(VideoSource.nb_frame)[0]], 0, per.couleur_dark, -1)
             cv2.addWeighted(overlay, cf.ALPHA, frame_annotation_copy, 1 - cf.ALPHA, 0, frame_annotation)
-            cv2.drawContours(frame_annotation, [per.contour_last_frame(VideoSource.nb_frame)[0]], 0, per.couleur_dark, 2)
+            cv2.drawContours(frame_annotation, [per.contour_last_frame(VideoSource.nb_frame)[0]], 0, per.couleur_dark, 1, cv2.CV_AA)
 
             #obtain current person's bounding box in order to draw on the displayed frame
             (x,y,w,h) = per.bbox_last_frame(VideoSource.nb_frame)
             cv2.rectangle(frame_annotation,(x, y),(x+w, y+h),per.couleur,2)
                             
             #draw current person's position on the frame
-            cv2.circle(frame_annotation, per.position_last_frame(VideoSource.nb_frame), 4, per.couleur, -1)
+            cv2.circle(frame_annotation, per.position_last_frame(VideoSource.nb_frame), 3, per.couleur, -1)
             
             previous_pos = (0,0)
             
             for i,p in enumerate(per.liste_positions[-100:]):
                 if (i>0):
-                    cv2.line(frame_annotation, previous_pos, p[0], per.couleur, 2)
+                    cv2.line(frame_annotation, previous_pos, p[0], per.couleur, 2, cv2.CV_AA)
                 previous_pos = p[0]
-            
+                
+
 def generate_border(VideoSource, logo,  persons, backup, zones, name_source):
     temp = np.ones((48,int(VideoSource.new_size[0]), 3), np.uint8)
     temp[:,:] = (255,255,255)
@@ -215,7 +215,7 @@ def generate_border(VideoSource, logo,  persons, backup, zones, name_source):
         lines.append(("{}: {} items".format(z[3], zones.count["entries"][z[0]] - zones.count["exits"][z[0]]), z[2][1]))
 
     for i,t in enumerate(lines):
-        cv2.putText(temp, t[0], (width_column*(i/nb_line),height_line*((i%nb_line)+1)), cf.FONT, 0.5, t[1], 1)
+        cv2.putText(temp, t[0], (width_column*(i/nb_line),height_line*((i%nb_line)+1)), cf.FONT, 0.5, t[1], 1, cv2.CV_AA)
 
     temp[0:logo.shape[0], temp.shape[1]-logo.shape[1]:int(VideoSource.new_size[0])] = logo
 
@@ -247,8 +247,6 @@ def draw_init_frame(VideoSource, frame, init_file):
 
     cv2.addWeighted(frame, alpha, temp, 1 - alpha, 0, frame)
 
-
-    
 
 def main():
 

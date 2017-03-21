@@ -19,11 +19,11 @@ VIDEO_SOURCE = 0
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute10\\cam2.avi"
 
-VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\street\\01\\street960.mp4"
+#VIDEO_SOURCE = "..\\dataset\\street\\01\\street960.mp4"
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute22\\cam2.avi"
 
-VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\GitHub\\RetailOpenCV\\dataset\\lego\\04\lego960.mp4"
+VIDEO_SOURCE = "..\\dataset\\lego\\04\\lego960.mp4"
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier Staub\\Documents\\ComputerVision_Detect_Body\\videoset\\chute16\\cam2.avi"
 
@@ -70,6 +70,7 @@ DIR_ZONES = "C:\\Users\\Olivier-Laforge\\Documents\\GitHub\\RetailOpenCV\\datase
 
 #DIR_ZONES = "C:\\Users\\Olivier\\Documents\\retail\\RetailOpenCV\\dataset\\zones"
 
+DIR_ZONES = "..\\dataset\\zones"
 
 
 '''
@@ -94,13 +95,11 @@ INIT_FILE = "init.png"
 '  DRAWING CONFIG
 '
 '''
-DRAW_CONFIG = True
+DRAW_CONFIG = False
 DRAW_ZONES = True
 DRAW_PERSONS = True
 DRAW_PERSON_PATH_TAIL = True
 DRAW_PERSON_PATH_TAIL_LENGTH = 400
-
-
 
 
 #donnee generales partagees
@@ -114,7 +113,6 @@ BORDER_BACKGROUND_COLOR = (0,0,0)
 BORDER_TEXT_COLOR = (0,0,0)
 
 to_be_sent = []
-
 
 
 def get_camera_id():
@@ -191,9 +189,9 @@ MIN_PERS_SIZE_Y = 50
 ''' Street Config '''
 '''
 CNT_MIN = 5
-MIN_SIZE_CNT_PERS = 5
+MIN_SIZE_CNT_PERS = 10
 
-MAX_DIST_CENTER_X = 75
+MAX_DIST_CENTER_X = 60
 MAX_DIST_CENTER_Y = 30
 
 MAX_PERS_SIZE_X = 220
@@ -217,6 +215,8 @@ MAX_PERS_SIZE_Y = 180
 
 MIN_PERS_SIZE_X = 25
 MIN_PERS_SIZE_Y = 25
+
+
 
 ''' Live config '''
 

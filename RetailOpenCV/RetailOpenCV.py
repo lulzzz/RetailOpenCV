@@ -244,7 +244,7 @@ def draw_init_frame(VideoSource, frame, init_file):
 
 
 def main():
-    #raw_input("Press enter to begin...")
+    raw_input("Press enter to begin...")
                
 
     #cv2.setUseOptimized(True)

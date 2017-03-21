@@ -14,7 +14,7 @@
     <RootNamespace>RetailOpenCV</RootNamespace>
     <InterpreterId>Global|PythonCore|2.7-32</InterpreterId>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>-i ..\dataset\lego\03\lego960.mp4</CommandLineArguments>
+    <CommandLineArguments>-i ..\dataset\lego\04\lego960.mp4</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -33,6 +33,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="cython_tools.pyx">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="detection_config_settings.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ForgroundExtraction.py">

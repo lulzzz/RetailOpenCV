@@ -116,7 +116,7 @@ def search_person_on_frame(contours):
             dist_y = abs(centre_ref[1] - centre_c[1])
 
             #check whether the contour is far from the biggest detected
-            if (dist_x < cf.MAX_DIST_CENTER_X) & (dist_y < cf.MAX_DIST_CENTER_Y):
+            if (dist_x < cf.dC.max_dist_center_x()) & (dist_y < cf.dC.max_dist_center_y()):
 
                 #check whether adding this contour would create a too big overall area for it to be a person
                 minx_temp = min(min([xmin(cnt) for cnt in res_temp]), xmin(c))
@@ -127,8 +127,8 @@ def search_person_on_frame(contours):
                 maxy_temp = max(max([ymax(cnt) for cnt in res_temp]), ymax(c))
                 height = maxy_temp - miny_temp
 
-                if (width > cf.MIN_PERS_SIZE_X) & (width < cf.MAX_PERS_SIZE_X):
-                    if (height > cf.MIN_PERS_SIZE_Y) & (height < cf.MAX_PERS_SIZE_Y):
+                if (width > cf.dC.min_pers_size_x()) & (width < cf.dC.max_pers_size_x()):
+                    if (height > cf.dC.min_pers_size_y()) & (height < cf.dC.max_pers_size_y()):
                         #if no consider the contour as part of the person
                         res_temp.append(copy(c))
                         for j,cnt in enumerate(contours):
@@ -149,7 +149,7 @@ def search_person_on_frame(contours):
     for c in res_temp:
         sum_area += cv2.contourArea(c)
 
-    if (xw > cf.MIN_PERS_SIZE_X) & (xw < cf.MAX_PERS_SIZE_X) & (yh < cf.MAX_PERS_SIZE_Y) & (yh > cf.MIN_PERS_SIZE_Y) & (sum_area > cf.MIN_SIZE_CNT_PERS):
+    if (xw > cf.dC.min_pers_size_x()) & (xw < cf.dC.max_pers_size_x()) & (yh < cf.dC.max_pers_size_y()) & (yh > cf.dC.min_pers_size_y()) & (sum_area > cf.dC.min_size_cnt_pers()):
         return True,res_temp
     else:
         return False,[]

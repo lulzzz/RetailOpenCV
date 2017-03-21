@@ -277,8 +277,10 @@ def main():
     
     print("Source: {}".format(name_source))
     
-    cf.apply_config_set(cf.ACTIVE_CONFIG_SET, VideoSource.new_size)
-    
+    #cf.apply_config_set(cf.ACTIVE_CONFIG_SET, VideoSource.new_size)
+    #print("Applying {} detection config".format(cf.ACTIVE_CONFIG_SET))
+
+
 
     camera = cv2.VideoCapture(input_video)
     #background substraction tools
@@ -393,7 +395,7 @@ def main():
 
 
                 #only keep the bigger contours (for noise removal)
-                contours = [c for c in cnt_approx if cv2.contourArea(c)>cf.CNT_MIN]
+                contours = [c for c in cnt_approx if cv2.contourArea(c) > cf.dC.cnt_min()]
 
                 
                 #if there are still some contours big enough present on the frame

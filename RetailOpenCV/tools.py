@@ -332,8 +332,10 @@ def time():
 
 
 def heat(min, max, val):
-    x = ((5.0*float(val))/(float(max)-float(min))) - float(min)
-    return 1 - (1 / (math.exp(x)))
+    if max != min:
+        x = ((5.0*float(val))/(float(max)-float(min))) - float(min)
+        return 1 - (1 / (math.exp(x)))
+    return 0
 
 
 def heatMap(persons, VideoSource):

@@ -495,7 +495,10 @@ def main():
     #process and display heat map
     if cf.DRAW_HEAT_MAP:
         print("Processing heat map")
+        t_heat_map = tl.time()
         heatmap = tl.heatMap(persons, VideoSource)   
+        t_a_heat_map = tl.time()
+        cv2.imwrite('heatmap.png', heatmap)
         while True:
             cv2.imshow("Heat map", heatmap)
             if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -614,6 +617,9 @@ def main():
     for t in tot:
         #t = float(t)/float(VideoSource.nb_frame)
         print('{}: {}ms'.format(t, (float(tot[t])/VideoSource.nb_frame)*1000))
+
+    if cf.DRAW_HEAT_MAP:
+        print("heat_map: {}ms".format(t_a_heat_map-t_heat_map))
     
     print("--------------------------")
     

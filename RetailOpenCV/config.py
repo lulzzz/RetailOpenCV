@@ -19,7 +19,7 @@ from detection_config_settings import DetectionConfig
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute10\\cam2.avi"
 
-VIDEO_SOURCE = "..\\dataset\\street\\07\\street960.mp4"
+VIDEO_SOURCE = "..\\dataset\\street\\01\\street960.mp4"
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute22\\cam2.avi"
 
@@ -101,7 +101,7 @@ DRAW_CONFIG = False
 DRAW_ZONES = True
 DRAW_PERSONS = True
 DRAW_PERSON_PATH_TAIL = True
-DRAW_PERSON_PATH_TAIL_LENGTH = 500
+DRAW_PERSON_PATH_TAIL_LENGTH = 100
 
 DRAW_HEAT_MAP = True
 HEAT_MAP_CELL_SIZE = 4

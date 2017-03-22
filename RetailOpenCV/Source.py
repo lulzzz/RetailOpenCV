@@ -67,12 +67,12 @@ class Source(object):
                 self.first_frame = copy(frame)
                 self.avg_frame = copy(frame)
 
-            if self.nb_frame < cf.TRAIN_FRAMES:
-                alpha = 1.0/float(cf.TRAIN_FRAMES)
-                cv2.addWeighted(frame, alpha, self.avg_frame, 1-alpha, 0, self.avg_frame)
+            #if self.nb_frame < cf.TRAIN_FRAMES:
+            alpha = 1.0/float(self.nb_total_frame)
+            cv2.addWeighted(frame, alpha, self.avg_frame, 1-alpha, 0, self.avg_frame)
 
-        if self.nb_frame == 1:
-            cv2.imwrite('out.png', frame)
+            if self.nb_frame == 1:
+                cv2.imwrite('out.png', frame)
 
         return ret,frame
 

@@ -12,6 +12,7 @@ from Person import Person
 import json
 import requests
 from numba import jit
+import math
 
 
 def xmax(cnt):
@@ -157,6 +158,7 @@ def search_person_on_frame(contours):
 #@jit
 def update_persons(persons, nb_frame, persons_on_frame):
     
+
     if len(persons) == 0:
         for pf in persons_on_frame:
             persons.append(Person(nb_frame, pf))
@@ -187,7 +189,8 @@ def kill(zones, persons, i, p, nb_frame, backup):
     cf.to_be_sent.append((str(p.uuid), 1, previous_zone_id, time()))
     if previous_zone_id != 1:
         zones.inc_out(previous_zone)
-    if p.age < 1000:
+    
+    if p.age < 50:
         backup.append(copy(p))
         persons.pop(i)
     
@@ -326,4 +329,63 @@ def random_color_zones():
 
 def time():
     return str(datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S"));
+
+
+def heat(min, max, val):
+    x = ((5.0*float(val))/(float(max)-float(min))) - float(min)
+    return 1 - (1 / (math.exp(x)))
+
+
+def heatMap(persons, VideoSource):
+
+    frame = copy(VideoSource.avg_frame)
+
+    '''
+    for x in range(int(VideoSource.new_size[0])/20):
+        cv2.line(frame, (x*20, 0), (x*20, int(VideoSource.new_size[1])), (255,255,255), 1, cv2.CV_AA)
+
+    for y in range(int(VideoSource.new_size[1])/20):
+        cv2.line(frame, (0, y*20), (int(VideoSource.new_size[0]), y*20), (255,255,255), 1, cv2.CV_AA)
+    '''
+
+    nb_pos_per_spot = np.zeros((int(VideoSource.new_size[1])/cf.HEAT_MAP_CELL_SIZE, int(VideoSource.new_size[0])/cf.HEAT_MAP_CELL_SIZE), np.uint8)
+    
+    for p in persons:
+        for pos, nb_frame in p.liste_positions:
+            nb_pos_per_spot[pos[1]/cf.HEAT_MAP_CELL_SIZE, pos[0]/cf.HEAT_MAP_CELL_SIZE] += 1
+    
+    max = np.amax(nb_pos_per_spot)
+    min = np.amin(nb_pos_per_spot)
+    
+    image = np.ones((cf.HEAT_MAP_CELL_SIZE, cf.HEAT_MAP_CELL_SIZE, 3), np.uint8)
+    image[:,:] = (0,0,255)
+
+    #frame[20:40, 20:40] = image
+
+    #cv2.addWeighted(image, 0.5, frame[20:40, 20:40], 0.5, 0, frame[20:40, 20:40])
+    '''
+    print("HEAT MAP")
+    print(nb_pos_per_spot.shape)
+    print(frame.shape)
+
+    print(max)
+    print(min)
+    '''
+    for y in range(nb_pos_per_spot.shape[0]):
+        for x in range(nb_pos_per_spot.shape[1]):
+
+            alpha = heat(min, max, nb_pos_per_spot[y,x])
+            #alpha = 0.5
+            #temp = frame[x*20:x*20+20, y*20:y*20+20]
+            #print("{} {} {} {}".format(y,x, nb_pos_per_spot[y,x],alpha))
+            cv2.addWeighted(image, alpha, frame[y*cf.HEAT_MAP_CELL_SIZE:y*cf.HEAT_MAP_CELL_SIZE+cf.HEAT_MAP_CELL_SIZE, x*cf.HEAT_MAP_CELL_SIZE:x*cf.HEAT_MAP_CELL_SIZE+cf.HEAT_MAP_CELL_SIZE], 1 - alpha, 0, frame[y*cf.HEAT_MAP_CELL_SIZE:y*cf.HEAT_MAP_CELL_SIZE+cf.HEAT_MAP_CELL_SIZE, x*cf.HEAT_MAP_CELL_SIZE:x*cf.HEAT_MAP_CELL_SIZE+cf.HEAT_MAP_CELL_SIZE])
+            #cv2.putText(frame, "{}".format(nb_pos_per_spot[y,x]), (x*20, y*20+20), cf.FONT, 0.5 , (255,255,255), 1, cv2.CV_AA)
+            #frame[x*20:x*20+20, y*20:y*20+20]
+
+    return frame
+
+    
+
+    
+
 

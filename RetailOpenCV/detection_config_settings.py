@@ -26,6 +26,17 @@ class DetectionConfig(object):
                 'MIN_PERS_SIZE_X': 25,
                 'MIN_PERS_SIZE_Y': 25 
             }
+        
+        self.configs['lego1080'] = {
+                'CNT_MIN': 20,
+                'MIN_SIZE_CNT_PERS': 20,
+                'MAX_DIST_CENTER_X': 160,
+                'MAX_DIST_CENTER_Y': 160,
+                'MAX_PERS_SIZE_X': 340, 
+                'MAX_PERS_SIZE_Y': 340,
+                'MIN_PERS_SIZE_X': 50,
+                'MIN_PERS_SIZE_Y': 50 
+            }
 
         self.configs['livefeed'] = {
                 'CNT_MIN': 5,

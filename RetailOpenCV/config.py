@@ -13,17 +13,17 @@ from detection_config_settings import DetectionConfig
 '
 '''
 
-#VIDEO_SOURCE = " http://96.10.1.168/mjpg/video.mjpg"
+#VIDEO_SOURCE = "http://96.10.1.168/mjpg/1/video.mjpg"
 
-VIDEO_SOURCE = 1
+#VIDEO_SOURCE = 1
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute10\\cam2.avi"
 
-#VIDEO_SOURCE = "..\\dataset\\street\\01\\street960.mp4"
+VIDEO_SOURCE = "..\\dataset\\street\\07\\street960.mp4"
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute22\\cam2.avi"
 
-VIDEO_SOURCE = "..\\dataset\\lego\\08\\lego960.mp4"
+#VIDEO_SOURCE = "..\\dataset\\lego960\\08\\lego.mp4"
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier Staub\\Documents\\ComputerVision_Detect_Body\\videoset\\chute16\\cam2.avi"
 
@@ -77,6 +77,7 @@ DIR_ZONES = "..\\dataset\\zones"
 '
 '  API CONFIG
 '
+
 '''
 
 SEND_DATA = False
@@ -84,7 +85,8 @@ API_GET_CAM_ID = ""
 API_POST_RESULTS = "http://hub-cargo.azurewebsites.net/api/hublog/notify"
 API_DEBUG = True
 API_SLEEP_TIME = 5
-OUTPUTFILE = open("out.json", "w")
+
+
 
 LOGO_FILE = "logo.png"
 INIT_FILE = "init.png"
@@ -98,8 +100,25 @@ INIT_FILE = "init.png"
 DRAW_CONFIG = False
 DRAW_ZONES = True
 DRAW_PERSONS = True
-DRAW_PERSON_PATH_TAIL = False
+DRAW_PERSON_PATH_TAIL = True
 DRAW_PERSON_PATH_TAIL_LENGTH = 500
+
+DRAW_HEAT_MAP = True
+HEAT_MAP_CELL_SIZE = 4
+
+'''
+'
+'  OUTPUT FILES
+'
+'''
+
+#sent json payloads logs
+OUTPUTFILE = open("out.json", "w")
+
+#rendered vide file
+RENDER_VIDEO = False
+def OUTPUT_VIDEO(sourceName):
+    return "out_{}.avi".format(sourceName)
 
 
 #donnee generales partagees
@@ -138,7 +157,7 @@ CURRENT_FRAME_SIZE = 0
 ALGO = 2
 LR = 0.002
 
-TRAIN_FRAMES = 200
+TRAIN_FRAMES = 300
 
 
 # Operateurs morphologiques
@@ -153,6 +172,11 @@ c_kernel=cv2.getStructuringElement(STR_ELEMENT,(FG_C_OP,FG_C_OP))
 
 
 #Minimum contour size for detection
+
+ACTIVE_CONFIG_SET = "street"
+
+dC = DetectionConfig(ACTIVE_CONFIG_SET)
+
 '''
 MAX_DIST_CENTRE = 180
 MAX_PERS_SIZE = 300
@@ -234,9 +258,7 @@ MIN_PERS_SIZE_X = 5
 MIN_PERS_SIZE_Y = 5
 '''
 
-ACTIVE_CONFIG_SET = "lego"
 
-dC = DetectionConfig(ACTIVE_CONFIG_SET)
 
 
 

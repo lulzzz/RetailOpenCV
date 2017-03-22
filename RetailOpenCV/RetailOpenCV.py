@@ -121,7 +121,7 @@ def print_annotation(frame, VideoSource, persons, backup, zones):
 
 def draw_config(VideoSource, frame_annotation, zones):
     #show config distance and size at the bottom of the frame
-    
+    '''
     cv2.line(frame_annotation, (4, int(VideoSource.new_size[1])), (4, int(VideoSource.new_size[1])-cf.MIN_PERS_SIZE_Y),  (0,0,255),1)
     cv2.line(frame_annotation, (8, int(VideoSource.new_size[1])), (8, int(VideoSource.new_size[1])-cf.MAX_PERS_SIZE_Y), (0,255,0),1)
     cv2.line(frame_annotation, (12, int(VideoSource.new_size[1])), (12, int(VideoSource.new_size[1])-cf.MAX_DIST_CENTER_Y), (255,0,0), 1)
@@ -129,9 +129,9 @@ def draw_config(VideoSource, frame_annotation, zones):
     cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-4), (cf.MIN_PERS_SIZE_X, int(VideoSource.new_size[1])-4), (0,0,255),1)
     cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-8), (cf.MAX_PERS_SIZE_X, int(VideoSource.new_size[1])-8), (0,255,0),1)
     cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-12), (cf.MAX_DIST_CENTER_X, int(VideoSource.new_size[1])-12), (255,0,0), 1)
-    
+    '''
     #recording dot
-    cv2.circle(frame_annotation, (int(VideoSource.new_size[0])-16, 15), 6, (0,255,0), -1)
+    #cv2.circle(frame_annotation, (int(VideoSource.new_size[0])-16, 15), 6, (0,255,0), -1)
 
     #dead zones
     '''
@@ -140,6 +140,14 @@ def draw_config(VideoSource, frame_annotation, zones):
     cv2.line(frame_annotation, (0, cf.DEAD_ZONE_Y), (int(VideoSource.new_size[0]), cf.DEAD_ZONE_Y), (255, 255, 0), 1)
     cv2.line(frame_annotation, (0, int(VideoSource.new_size[1]) - cf.DEAD_ZONE_Y), (int(VideoSource.new_size[0]), int(VideoSource.new_size[1]) - cf.DEAD_ZONE_Y), (255, 255, 0), 1)
     '''
+    '''
+    for x in range(int(VideoSource.new_size[0])/20):
+        cv2.line(frame_annotation, (x*20, 0), (x*20, int(VideoSource.new_size[1])), (255,255,255), 1, cv2.CV_AA)
+
+    for y in range(int(VideoSource.new_size[1])/20):
+        cv2.line(frame_annotation, (0, y*20), (int(VideoSource.new_size[0]), y*20), (255,255,255), 1, cv2.CV_AA)
+    '''
+    
 
 def draw_zones(zones, frame_annotation):
     if zones.nb_zones() > 0:
@@ -275,7 +283,7 @@ def main():
     if(input_video==0)|(input_video==1):
         name_source = "Webcam"
     else:
-        name_source = os.path.basename(input_video)
+        name_source = os.path.basename(input_video).split('.')[0]
 
     VideoSource = Source(input_video)
     
@@ -285,8 +293,10 @@ def main():
     #print("Applying {} detection config".format(cf.ACTIVE_CONFIG_SET))
 
 
+    if cf.RENDER_VIDEO:
+        output_video = cv2.VideoWriter(cf.OUTPUT_VIDEO(name_source), cv2.cv.CV_FOURCC(*'MJPG'), 20, (int(VideoSource.new_size[0]), int(VideoSource.new_size[1])))
 
-    camera = cv2.VideoCapture(input_video)
+
     #background substraction tools
     fgbg = ForgroundExtraction(cf.ALGO, VideoSource.new_size)
 
@@ -461,6 +471,9 @@ def main():
         else:
             draw_init_frame(VideoSource, frame_annotation, init_file)
 
+        if cf.RENDER_VIDEO:
+            output_video.write(frame_annotation)
+        
         border = generate_border(VideoSource, logo_file, persons, backup_dead_persons, zones, name_source)
         frame_annotation = assemble_frame_border(frame_annotation, border)
 
@@ -469,25 +482,43 @@ def main():
         #cv2.imshow('Forground detection',forground)
 
         cv2.imshow('Tracking',frame_annotation)
+        
 
         timer.append(t)         
 
 
-    print("Killing current items")
+    print("Killing {} alive current items".format(len(persons)))
     for i,p in enumerate(persons):
         print("{} {} {} dies    {} age {}".format(VideoSource.nb_frame, tl.time(), p.puuid, p.last_zone(), p.age))
         tl.kill(zones, persons, i, p, VideoSource.nb_frame, backup_dead_persons)
 
-    t_end = time.time()
+    #process and display heat map
+    if cf.DRAW_HEAT_MAP:
+        print("Processing heat map")
+        heatmap = tl.heatMap(persons, VideoSource)   
+        while True:
+            cv2.imshow("Heat map", heatmap)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break   
 
-    #release the camera and close opencv windows
-    VideoSource.release()
-    cv2.destroyAllWindows()
+    t_end = time.time()
 
     #clean stop the thread sending the data
     sendingDataThread.stop()
     sendingDataThread.join()
     print("Thread stopped")
+
+    #release the camera and eventually the output video file
+    VideoSource.release()
+    if cf.RENDER_VIDEO:
+        output_video.release()
+
+
+
+    #close all windows properly
+    cv2.destroyAllWindows()
+
+
     print("--------------------------")
     print("Summary")
     #data = {'persons':[]}

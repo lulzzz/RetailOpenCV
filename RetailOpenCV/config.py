@@ -81,7 +81,7 @@ DIR_ZONES = "..\\dataset\\zones"
 
 SEND_DATA = False
 API_GET_CAM_ID = ""
-API_POST_RESULTS = "http://cargo-hub.azurewebsites.net/api/hublog/notify"
+API_POST_RESULTS = "http://hub-cargo.azurewebsites.net/api/hublog/notify"
 API_DEBUG = True
 API_SLEEP_TIME = 5
 OUTPUTFILE = open("out.json", "w")
@@ -98,8 +98,8 @@ INIT_FILE = "init.png"
 DRAW_CONFIG = False
 DRAW_ZONES = True
 DRAW_PERSONS = True
-DRAW_PERSON_PATH_TAIL = True
-DRAW_PERSON_PATH_TAIL_LENGTH = 400
+DRAW_PERSON_PATH_TAIL = False
+DRAW_PERSON_PATH_TAIL_LENGTH = 500
 
 
 #donnee generales partagees

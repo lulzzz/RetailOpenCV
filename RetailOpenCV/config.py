@@ -4,7 +4,7 @@ from datetime import datetime
 from random import randint
 import os
 import time
-
+from detection_config_settings import DetectionConfig
 
 
 '''
@@ -13,9 +13,9 @@ import time
 '
 '''
 
-VIDEO_SOURCE = " http://96.10.1.168/mjpg/video.mjpg"
+#VIDEO_SOURCE = " http://96.10.1.168/mjpg/video.mjpg"
 
-VIDEO_SOURCE = 0
+VIDEO_SOURCE = 1
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute10\\cam2.avi"
 
@@ -23,7 +23,7 @@ VIDEO_SOURCE = 0
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute22\\cam2.avi"
 
-VIDEO_SOURCE = "..\\dataset\\lego\\04\\lego960.mp4"
+VIDEO_SOURCE = "..\\dataset\\lego\\08\\lego960.mp4"
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier Staub\\Documents\\ComputerVision_Detect_Body\\videoset\\chute16\\cam2.avi"
 
@@ -83,7 +83,7 @@ SEND_DATA = False
 API_GET_CAM_ID = ""
 API_POST_RESULTS = "http://cargo-hub.azurewebsites.net/api/hublog/notify"
 API_DEBUG = True
-API_SLEEP_TIME=5
+API_SLEEP_TIME = 5
 OUTPUTFILE = open("out.json", "w")
 
 LOGO_FILE = "logo.png"
@@ -203,7 +203,7 @@ MIN_PERS_SIZE_Y = 10
 
 
 ''' Lego Config '''
-
+'''
 CNT_MIN = 10
 MIN_SIZE_CNT_PERS = 10
 
@@ -215,7 +215,7 @@ MAX_PERS_SIZE_Y = 180
 
 MIN_PERS_SIZE_X = 25
 MIN_PERS_SIZE_Y = 25
-
+'''
 
 
 ''' Live config '''
@@ -236,6 +236,11 @@ MIN_PERS_SIZE_Y = 5
 
 ACTIVE_CONFIG_SET = "lego"
 
+dC = DetectionConfig(ACTIVE_CONFIG_SET)
+
+
+
+'''
 config_set = {}
         
 config_set['chute'] = {
@@ -301,7 +306,7 @@ def apply_config_set(setname, videoDim):
         MAX_PERS_SIZE_Y = config_set[setname]['MAX_PERS_SIZE_Y']
         MIN_PERS_SIZE_X = config_set[setname]['MIN_PERS_SIZE_X']
         MIN_PERS_SIZE_Y = config_set[setname]['MIN_PERS_SIZE_Y']
-
+'''
 
 #FRAME LIMITS (KILLING ZONE)
 

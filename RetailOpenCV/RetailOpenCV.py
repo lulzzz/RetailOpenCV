@@ -81,7 +81,11 @@ class SendDataThread(threading.Thread):
         try:
             res = requests.post(cf.API_POST_RESULTS, data=send_json, headers=headers)
             if res.status_code == 200:
-                print("\nAPI Status 200 response: {}\n".format(res.text))
+                print("API Status 200 response: {}".format(res.text))
+                return True
+            elif res.status_code == 500:
+                print("API Status Response {}".format(res.status_code))
+                #print("API Response: {}".format(res.text))
                 return True
             else:
                 print("API Status Response {}".format(res.status_code))
@@ -474,9 +478,9 @@ def main():
 
 
 
-
-
-
+    for i,p in enumerate(persons):
+        print("Killing {}".format(p.puuid))
+        tl.kill(zones, persons, i, p, VideoSource.nb_frame, backup_dead_persons)
 
     t_end = time.time()
 
@@ -527,7 +531,7 @@ def main():
     
     
     print("--------------------------")
-    
+    '''
     print("Performances")
 
 
@@ -585,7 +589,7 @@ def main():
         print('{}: {}ms'.format(t, (float(tot[t])/VideoSource.nb_frame)*1000))
     
     print("--------------------------")
-    
+    '''
     
 
     '''

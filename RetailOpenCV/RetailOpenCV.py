@@ -618,8 +618,8 @@ def main():
         #t = float(t)/float(VideoSource.nb_frame)
         print('{}: {}ms'.format(t, (float(tot[t])/VideoSource.nb_frame)*1000))
 
-    if cf.DRAW_HEAT_MAP:
-        print("heat_map: {}ms".format(t_a_heat_map-t_heat_map))
+    #if cf.DRAW_HEAT_MAP:
+        #print("heat_map: {}ms".format(t_a_heat_map-t_heat_map))
     
     print("--------------------------")
     

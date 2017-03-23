@@ -71,7 +71,7 @@ DIR_ZONES = "C:\\Users\\Olivier-Laforge\\Documents\\GitHub\\RetailOpenCV\\datase
 #DIR_ZONES = "C:\\Users\\Olivier\\Documents\\retail\\RetailOpenCV\\dataset\\zones"
 
 DIR_ZONES = "..\\dataset\\zones"
-
+DIR_ZONES = "../dataset/zones"
 
 '''
 '
@@ -87,7 +87,6 @@ API_DEBUG = True
 API_SLEEP_TIME = 5
 
 
-
 LOGO_FILE = "logo.png"
 INIT_FILE = "init.png"
 
@@ -97,6 +96,7 @@ INIT_FILE = "init.png"
 '  DRAWING CONFIG
 '
 '''
+DISPLAYED_FRAME = 5
 DRAW_CONFIG = False
 DRAW_ZONES = True
 DRAW_PERSONS = True
@@ -104,7 +104,7 @@ DRAW_PERSON_PATH_TAIL = False
 DRAW_PERSON_PATH_TAIL_LENGTH = 400
 
 DRAW_HEAT_MAP = True
-HEAT_MAP_CELL_SIZE = 10
+HEAT_MAP_CELL_SIZE = 5
 
 '''
 '
@@ -155,9 +155,9 @@ CURRENT_FRAME_SIZE = 0
 #Forground Extraction Config
 
 ALGO = 2
-LR = 0.002
+LR = 0.001
 
-TRAIN_FRAMES = 300
+TRAIN_FRAMES = 200
 
 
 # Operateurs morphologiques
@@ -176,6 +176,16 @@ c_kernel=cv2.getStructuringElement(STR_ELEMENT,(FG_C_OP,FG_C_OP))
 ACTIVE_CONFIG_SET = "street"
 
 dC = DetectionConfig(ACTIVE_CONFIG_SET)
+
+
+
+DEAD_ZONE_Y = 15
+DEAD_ZONE_X = 12
+
+NO_SEE_FRAMES_BEFORE_DEATH = 150
+NO_SEE_FRAMES_BEFORE_DEATH_BORDERS = 5
+
+ALPHA = 0.5
 
 '''
 MAX_DIST_CENTRE = 180
@@ -332,13 +342,7 @@ def apply_config_set(setname, videoDim):
 
 #FRAME LIMITS (KILLING ZONE)
 
-DEAD_ZONE_Y = 15
-DEAD_ZONE_X = 12
 
-NO_SEE_FRAMES_BEFORE_DEATH = 250
-NO_SEE_FRAMES_BEFORE_DEATH_BORDERS = 5
-
-ALPHA = 0.5
 
 
     

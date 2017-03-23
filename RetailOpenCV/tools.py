@@ -11,7 +11,7 @@ from ForgroundExtraction import ForgroundExtraction
 from Person import Person
 import json
 import requests
-from numba import jit
+#from numba import jit
 import math
 
 
@@ -331,12 +331,16 @@ def time():
     return str(datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S"));
 
 
-def heat(min, max, val):
+def heat_log(min, max, val):
     if max != min:
         x = ((5.0*float(val))/(float(max)-float(min))) - float(min)
         return 1 - (1 / (math.exp(x)))
     return 0
 
+def heat_linear(min, max, val):
+    if max != min:
+        return ((float(val))/(float(max)-float(min))) - float(min)
+    return 0
 
 def heatMap(persons, VideoSource):
 
@@ -376,7 +380,7 @@ def heatMap(persons, VideoSource):
     for y in range(nb_pos_per_spot.shape[0]):
         for x in range(nb_pos_per_spot.shape[1]):
 
-            alpha = heat(min, max, nb_pos_per_spot[y,x])
+            alpha = heat_linear(min, max, nb_pos_per_spot[y,x])/2 + heat_log(min, max, nb_pos_per_spot[y,x])/2
             #alpha = 0.5
             #temp = frame[x*20:x*20+20, y*20:y*20+20]
             #print("{} {} {} {}".format(y,x, nb_pos_per_spot[y,x],alpha))

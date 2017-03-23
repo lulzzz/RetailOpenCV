@@ -432,40 +432,41 @@ def main():
                         
 
                         #when possible persons are identified on the frame, try to track them, ie associate these persons with the ones already registered
-                        t['update_persons'] = time.time()
-                        tl.update_persons(persons, VideoSource.nb_frame, temp_persons_detected_on_current_frame)
-                        t['a_update_persons'] = time.time()
+                    	if VideoSource.nb_frame % cf.DISPLAYED_FRAME == 0:
+	                        t['update_persons'] = time.time()
+	                        tl.update_persons(persons, VideoSource.nb_frame, temp_persons_detected_on_current_frame)
+	                        t['a_update_persons'] = time.time()
 
 
-                        t['update_zones'] = time.time()
-                        tl.update_persons_zones(persons, VideoSource.nb_frame, zones)
-                        t['a_update_zones'] = time.time()				
+	                        t['update_zones'] = time.time()
+	                        tl.update_persons_zones(persons, VideoSource.nb_frame, zones)
+	                        t['a_update_zones'] = time.time()				
                     
         
             '''
             '
             '   DRAWING
             '
-            '''       
+            '''
+            if VideoSource.nb_frame % cf.DISPLAYED_FRAME == 0:
+	            #draw general information
+	            #frame_annotation_copy = frame_annotation.copy()
+	            t['draw_general'] = time.time()
+	            if cf.DRAW_CONFIG:
+	                draw_config(VideoSource, frame_annotation, zones)
+	            t['a_draw_general'] = time.time()
 
-            #draw general information
-            #frame_annotation_copy = frame_annotation.copy()
-            t['draw_general'] = time.time()
-            if cf.DRAW_CONFIG:
-                draw_config(VideoSource, frame_annotation, zones)
-            t['a_draw_general'] = time.time()
+	            #draw detection zone on the frame
+	            t['draw_zones'] = time.time()
+	            if cf.DRAW_ZONES:
+	                draw_zones(zones, frame_annotation)
+	            t['a_draw_zones'] = time.time()
 
-            #draw detection zone on the frame
-            t['draw_zones'] = time.time()
-            if cf.DRAW_ZONES:
-                draw_zones(zones, frame_annotation)
-            t['a_draw_zones'] = time.time()
-
-            #draw the detected persons on the frame
-            t['draw_persons'] = time.time()
-            if cf.DRAW_PERSONS:
-                draw_persons(persons, VideoSource, frame_annotation, frame_annotation)
-            t['a_draw_persons'] = time.time()
+	            #draw the detected persons on the frame
+	            t['draw_persons'] = time.time()
+	            if cf.DRAW_PERSONS:
+	                draw_persons(persons, VideoSource, frame_annotation, frame_annotation)
+	            t['a_draw_persons'] = time.time()
 
 
         else:
@@ -474,18 +475,21 @@ def main():
         if cf.RENDER_VIDEO:
             output_video.write(frame_annotation)
         
-        border = generate_border(VideoSource, logo_file, persons, backup_dead_persons, zones, name_source)
-        frame_annotation = assemble_frame_border(frame_annotation, border)
+        if VideoSource.nb_frame % cf.DISPLAYED_FRAME == 0:
+	        border = generate_border(VideoSource, logo_file, persons, backup_dead_persons, zones, name_source)
+	        frame_annotation = assemble_frame_border(frame_annotation, border)
 
+	        #display the frame
+	        
+	        #cv2.imshow('Forground detection',forground)
 
-        #display the frame
-        #cv2.imshow('Forground detection',forground)
-
-        cv2.imshow('Tracking',frame_annotation)
-        
+	        t['imshow'] = time.time()
+	        cv2.imshow('Tracking',frame_annotation)
+	        t['a_imshow'] = time.time()
 
         timer.append(t)         
 
+    t_end = time.time()
 
     print("Killing {} alive current items".format(len(persons)))
     for i,p in enumerate(persons):
@@ -495,16 +499,16 @@ def main():
     #process and display heat map
     if cf.DRAW_HEAT_MAP:
         print("Processing heat map")
-        t_heat_map = tl.time()
+        t_heat_map = time.time()
         heatmap = tl.heatMap(persons, VideoSource)   
-        t_a_heat_map = tl.time()
+        t_a_heat_map = time.time()
         cv2.imwrite('heatmap.png', heatmap)
         while True:
             cv2.imshow("Heat map", heatmap)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break   
 
-    t_end = time.time()
+    
 
     #clean stop the thread sending the data
     sendingDataThread.stop()
@@ -577,6 +581,7 @@ def main():
     tot['draw_general'] = 0
     tot['draw_zones'] = 0
     tot['draw_persons'] = 0
+    tot['imshow'] = 0
 
     for t in timer:
 
@@ -614,12 +619,15 @@ def main():
         if 'draw_persons' in t:
             tot['draw_persons'] += t['a_draw_persons'] - t['draw_persons']
 
+        if 'imshow' in t:
+            tot['imshow'] += t['a_imshow'] - t['imshow']
+
     for t in tot:
         #t = float(t)/float(VideoSource.nb_frame)
         print('{}: {}ms'.format(t, (float(tot[t])/VideoSource.nb_frame)*1000))
 
-    #if cf.DRAW_HEAT_MAP:
-        #print("heat_map: {}ms".format(t_a_heat_map-t_heat_map))
+    if cf.DRAW_HEAT_MAP:
+        print("heat_map: {}ms".format(t_a_heat_map-t_heat_map))
     
     print("--------------------------")
     

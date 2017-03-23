@@ -324,6 +324,8 @@ def main():
     #main loop
     print("Start training background detection")
 
+    cf.T_START = time.time()
+
     while (True):
 
         t = {}

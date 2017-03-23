@@ -44,7 +44,8 @@ class Source(object):
         cf.CURRENT_FRAME_SIZE = self.new_size
         self.current_frame = np.zeros((int(self.video_dim()[0]), int(self.video_dim()[1])), dtype=np.uint8)
         self.first_frame = np.zeros((int(self.video_dim()[0]), int(self.video_dim()[1])), dtype=np.uint8)
-        self.avg_frame = np.zeros((int(self.video_dim()[0]), int(self.video_dim()[1])), dtype=np.uint8)
+        self.avg_frame = np.zeros((int(self.video_dim()[1]), int(self.video_dim()[0]), 3), dtype=np.uint8)
+
 
         self.nb_total_frame = 0
         if (path != 0) & (path != 1):
@@ -65,14 +66,16 @@ class Source(object):
 
             if self.nb_frame == 1:
                 self.first_frame = copy(frame)
-                self.avg_frame = copy(frame)
 
-            if self.nb_frame < cf.TRAIN_FRAMES:
-                alpha = 1.0/float(self.nb_total_frame)
-                cv2.addWeighted(frame, alpha, self.avg_frame, 1-alpha, 0, self.avg_frame)
+            if self.nb_frame < self.nb_total_frame:
+                alpha = 0.02
+                cv2.addWeighted(frame, alpha, self.avg_frame, 1-alpha, alpha, self.avg_frame)
 
             if self.nb_frame == 1:
                 cv2.imwrite('out.png', frame)
+
+            if self.nb_frame == self.nb_total_frame - 1:
+                cv2.imwrite('avg.png', self.avg_frame)
 
         return ret,frame
 

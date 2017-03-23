@@ -186,11 +186,11 @@ def draw_persons(persons, VideoSource, frame_annotation, frame_annotation_copy):
             #obtain current person's bounding box in order to draw on the displayed frame
             (x,y,w,h) = per.bbox_last_frame(VideoSource.nb_frame)
             cv2.rectangle(frame_annotation,(x, y),(x+w, y+h),per.couleur,2)
+            cv2.putText(frame_annotation, per.puuid, (x,y), cf.FONT, 0.4, per.couleur, 1, cv2.CV_AA)
                             
             #draw current person's position on the frame
             cv2.circle(frame_annotation, per.position_last_frame(VideoSource.nb_frame), 3, per.couleur, -1, cv2.CV_AA)
             
-
             if cf.DRAW_PERSON_PATH_TAIL:
                 previous_pos = (0,0)
             
@@ -450,24 +450,24 @@ def main():
             '
             '''
             if VideoSource.nb_frame % cf.DISPLAYED_FRAME == 0:
-	            #draw general information
-	            #frame_annotation_copy = frame_annotation.copy()
-	            t['draw_general'] = time.time()
-	            if cf.DRAW_CONFIG:
-	                draw_config(VideoSource, frame_annotation, zones)
-	            t['a_draw_general'] = time.time()
+                #draw general information
+                #frame_annotation_copy = frame_annotation.copy()
+                t['draw_general'] = time.time()
+                if cf.DRAW_CONFIG:
+                    draw_config(VideoSource, frame_annotation, zones)
+                t['a_draw_general'] = time.time()
 
-	            #draw detection zone on the frame
-	            t['draw_zones'] = time.time()
-	            if cf.DRAW_ZONES:
-	                draw_zones(zones, frame_annotation)
-	            t['a_draw_zones'] = time.time()
+                #draw detection zone on the frame
+                t['draw_zones'] = time.time()
+                if cf.DRAW_ZONES:
+                    draw_zones(zones, frame_annotation)
+                t['a_draw_zones'] = time.time()
 
-	            #draw the detected persons on the frame
-	            t['draw_persons'] = time.time()
-	            if cf.DRAW_PERSONS:
-	                draw_persons(persons, VideoSource, frame_annotation, frame_annotation)
-	            t['a_draw_persons'] = time.time()
+                #draw the detected persons on the frame
+                t['draw_persons'] = time.time()
+                if cf.DRAW_PERSONS:
+                    draw_persons(persons, VideoSource, frame_annotation, frame_annotation)
+                t['a_draw_persons'] = time.time()
 
 
         else:
@@ -477,16 +477,16 @@ def main():
             output_video.write(frame_annotation)
         
         if VideoSource.nb_frame % cf.DISPLAYED_FRAME == 0:
-	        border = generate_border(VideoSource, logo_file, persons, backup_dead_persons, zones, name_source)
-	        frame_annotation = assemble_frame_border(frame_annotation, border)
+            border = generate_border(VideoSource, logo_file, persons, backup_dead_persons, zones, name_source)
+            frame_annotation = assemble_frame_border(frame_annotation, border)
 
-	        #display the frame
-	        
-	        #cv2.imshow('Forground detection',forground)
+            #display the frame
+            
+            #cv2.imshow('Forground detection',forground)
 
-	        t['imshow'] = time.time()
-	        cv2.imshow('Tracking',frame_annotation)
-	        t['a_imshow'] = time.time()
+            t['imshow'] = time.time()
+            cv2.imshow('Tracking',frame_annotation)
+            t['a_imshow'] = time.time()
 
         timer.append(t)         
 

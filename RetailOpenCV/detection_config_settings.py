@@ -7,6 +7,8 @@ class DetectionConfig(object):
         self.configs = {}
 
         self.configs['chute'] = {
+                'width': 960,
+                'height': 540,
                 'CNT_MIN': 30,
                 'MIN_SIZE_CNT_PERS': 30,
                 'MAX_DIST_CENTER_X': 160,
@@ -16,7 +18,10 @@ class DetectionConfig(object):
                 'MIN_PERS_SIZE_X': 30,
                 'MIN_PERS_SIZE_Y': 50 
             }
+
         self.configs['lego'] = {
+                'width': 960,
+                'height': 540,
                 'CNT_MIN': 10,
                 'MIN_SIZE_CNT_PERS': 10,
                 'MAX_DIST_CENTER_X': 80,
@@ -28,6 +33,8 @@ class DetectionConfig(object):
             }
         
         self.configs['lego1080'] = {
+                'width': 1920,
+                'height': 1080,
                 'CNT_MIN': 20,
                 'MIN_SIZE_CNT_PERS': 20,
                 'MAX_DIST_CENTER_X': 160,
@@ -39,6 +46,8 @@ class DetectionConfig(object):
             }
 
         self.configs['livefeed'] = {
+                'width': 960,
+                'height': 540,
                 'CNT_MIN': 5,
                 'MIN_SIZE_CNT_PERS': 5,
                 'MAX_DIST_CENTER_X': 50,
@@ -50,6 +59,8 @@ class DetectionConfig(object):
             }
 
         self.configs['street'] = {
+                'width': 960,
+                'height': 540,
                 'CNT_MIN': 5,
                 'MIN_SIZE_CNT_PERS': 10,
                 'MAX_DIST_CENTER_X': 60,
@@ -65,7 +76,19 @@ class DetectionConfig(object):
                 for key in self.configs[setConfig]:
                     self.activeConfigSet[key] = self.configs[setConfig][key]
 
-    
+    def resize_config(self, width, height):
+        size_ratio = float(width) / float(self.activeConfigSet['width'])
+        area_ratio = size_ratio ** 2
+
+        print("active config")  
+        print(self.activeConfigSet)
+
+        for key in self.activeConfigSet:
+            self.activeConfigSet[key] = int(self.activeConfigSet[key] * size_ratio)
+
+        print("resized config")
+        print(self.activeConfigSet)
+
     def cnt_min(self):
         return int(self.activeConfigSet['CNT_MIN'])
 

@@ -287,6 +287,8 @@ def main():
 
     VideoSource = Source(input_video)
     
+    cf.dC.resize_config(VideoSource.new_size[0], VideoSource.new_size[1])
+
     print("Source: {}".format(name_source))
     
     #cf.apply_config_set(cf.ACTIVE_CONFIG_SET, VideoSource.new_size)
@@ -430,7 +432,7 @@ def main():
                             temp_persons_detected_on_current_frame.append(l)
                         previous_len_cnt = len(contours)
 
-                    if (len(temp_persons_detected_on_current_frame)>0)&(len(temp_persons_detected_on_current_frame)<30):
+                    if (len(temp_persons_detected_on_current_frame) > 0) & (len(temp_persons_detected_on_current_frame) < 30):
                         
 
                         #when possible persons are identified on the frame, try to track them, ie associate these persons with the ones already registered

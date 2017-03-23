@@ -175,7 +175,6 @@ c_kernel=cv2.getStructuringElement(STR_ELEMENT,(FG_C_OP,FG_C_OP))
 #Minimum contour size for detection
 
 ACTIVE_CONFIG_SET = "street"
-
 dC = DetectionConfig(ACTIVE_CONFIG_SET)
 
 

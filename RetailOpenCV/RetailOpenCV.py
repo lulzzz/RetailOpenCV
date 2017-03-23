@@ -432,15 +432,14 @@ def main():
                         
 
                         #when possible persons are identified on the frame, try to track them, ie associate these persons with the ones already registered
-                    	if VideoSource.nb_frame % cf.DISPLAYED_FRAME == 0:
-	                        t['update_persons'] = time.time()
-	                        tl.update_persons(persons, VideoSource.nb_frame, temp_persons_detected_on_current_frame)
-	                        t['a_update_persons'] = time.time()
+                        t['update_persons'] = time.time()
+                        tl.update_persons(persons, VideoSource.nb_frame, temp_persons_detected_on_current_frame)
+                        t['a_update_persons'] = time.time()
 
 
-	                        t['update_zones'] = time.time()
-	                        tl.update_persons_zones(persons, VideoSource.nb_frame, zones)
-	                        t['a_update_zones'] = time.time()				
+                        t['update_zones'] = time.time()
+                        tl.update_persons_zones(persons, VideoSource.nb_frame, zones)
+                        t['a_update_zones'] = time.time()				
                     
         
             '''

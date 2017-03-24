@@ -128,6 +128,8 @@ class Person(object):
         else:
             return False
 
+    def last_seen_frame(self):
+        return self.liste_contours[-1][0]
 
     def last_zone(self):
         if len(self.liste_zones)==0:

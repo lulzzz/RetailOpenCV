@@ -443,7 +443,13 @@ def main():
 
                         t['update_zones'] = time.time()
                         tl.update_persons_zones(persons, VideoSource.nb_frame, zones)
-                        t['a_update_zones'] = time.time()				
+                        t['a_update_zones'] = time.time()	
+
+                        diseppeared = tl.search_for_diseppeared_persons(persons, VideoSource)
+                        #print("disepeared {}".format(len(diseppeared)))
+                        if len(diseppeared) > 0:
+                            for p in diseppeared:
+                                zones.add_new_zone(p[0], p[1])
                     
         
             '''

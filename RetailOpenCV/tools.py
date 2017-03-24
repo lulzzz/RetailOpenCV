@@ -218,9 +218,9 @@ def search_for_diseppeared_persons(persons, VideoSource):
     for p in persons:
         #print('test {} {} {}'.format(p.last_seen_frame(), VideoSource.nb_frame -1, p.age))
         if p.last_seen_frame() == (VideoSource.nb_frame - 1):
-            if p.age > 50:
+            if p.age > 100:
 
-                x,y,w,h = bbox(p.liste_contours[-50][1])
+                x,y,w,h = bbox(p.liste_contours[-100][1])
 
                 cnt = []
                 points = []
@@ -232,7 +232,6 @@ def search_for_diseppeared_persons(persons, VideoSource):
                 for point in points:
                     cnt.append([point])
 
-                print(np.array(cnt))
                 res.append(([np.array(cnt)], p.puuid))        
     return res
 

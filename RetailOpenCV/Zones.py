@@ -66,7 +66,6 @@ class Zones(object):
                         couleur = tl.random_color()
                         #(name of the zone, liste of contours defining the zone, color of the zone on the frame)
                         self.masks.append((zone_name, contours, couleur, self.zone_id))
-                        print(contours)
                         self.count["entries"][zone_name] = 0
                         self.count["exits"][zone_name] = 0
                         print("Zone {} {}".format(self.zone_id, zone_name))

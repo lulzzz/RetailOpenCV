@@ -543,7 +543,7 @@ def main():
 
     print("{} Frames".format(VideoSource.nb_frame))
     print("{} s".format(round(t_end - cf.T_START, 2)))
-    print("{} AVG FPS".format(float(VideoSource.nb_frame)/(time.time()-cf.T_START)))
+    print("{} AVG FPS".format(float(VideoSource.nb_frame)/(t_end-cf.T_START)))
     print("{} ms/frame".format(round(((time.time()-cf.T_START)*1000)/float(VideoSource.nb_frame), 2)))
     print("--------------------------")
 

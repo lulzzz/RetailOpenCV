@@ -21,7 +21,7 @@ import threading
 import time
 import os
 from multiprocessing import Process, TimeoutError
-
+from detection_config_settings import DetectionConfig
 
 
 class SendDataThread(threading.Thread):
@@ -121,7 +121,7 @@ def print_annotation(frame, VideoSource, persons, backup, zones):
 
 def draw_config(VideoSource, frame_annotation, zones):
     #show config distance and size at the bottom of the frame
-    '''
+    
     cv2.line(frame_annotation, (4, int(VideoSource.new_size[1])), (4, int(VideoSource.new_size[1])-cf.MIN_PERS_SIZE_Y),  (0,0,255),1)
     cv2.line(frame_annotation, (8, int(VideoSource.new_size[1])), (8, int(VideoSource.new_size[1])-cf.MAX_PERS_SIZE_Y), (0,255,0),1)
     cv2.line(frame_annotation, (12, int(VideoSource.new_size[1])), (12, int(VideoSource.new_size[1])-cf.MAX_DIST_CENTER_Y), (255,0,0), 1)
@@ -129,24 +129,24 @@ def draw_config(VideoSource, frame_annotation, zones):
     cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-4), (cf.MIN_PERS_SIZE_X, int(VideoSource.new_size[1])-4), (0,0,255),1)
     cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-8), (cf.MAX_PERS_SIZE_X, int(VideoSource.new_size[1])-8), (0,255,0),1)
     cv2.line(frame_annotation, (0,int(VideoSource.new_size[1])-12), (cf.MAX_DIST_CENTER_X, int(VideoSource.new_size[1])-12), (255,0,0), 1)
-    '''
+    
     #recording dot
     #cv2.circle(frame_annotation, (int(VideoSource.new_size[0])-16, 15), 6, (0,255,0), -1)
 
     #dead zones
-    '''
+    
     cv2.line(frame_annotation, ( cf.DEAD_ZONE_X, 0), (cf.DEAD_ZONE_X, int(VideoSource.new_size[1])), (255,255, 0), 1)
     cv2.line(frame_annotation, ( int(VideoSource.new_size[0]) - cf.DEAD_ZONE_X, 0), ( int(VideoSource.new_size[0]) - cf.DEAD_ZONE_X, int(VideoSource.new_size[1])), (255,255, 0), 1)
     cv2.line(frame_annotation, (0, cf.DEAD_ZONE_Y), (int(VideoSource.new_size[0]), cf.DEAD_ZONE_Y), (255, 255, 0), 1)
     cv2.line(frame_annotation, (0, int(VideoSource.new_size[1]) - cf.DEAD_ZONE_Y), (int(VideoSource.new_size[0]), int(VideoSource.new_size[1]) - cf.DEAD_ZONE_Y), (255, 255, 0), 1)
-    '''
-    '''
+    
+    
     for x in range(int(VideoSource.new_size[0])/20):
         cv2.line(frame_annotation, (x*20, 0), (x*20, int(VideoSource.new_size[1])), (255,255,255), 1, cv2.CV_AA)
 
     for y in range(int(VideoSource.new_size[1])/20):
         cv2.line(frame_annotation, (0, y*20), (int(VideoSource.new_size[0]), y*20), (255,255,255), 1, cv2.CV_AA)
-    '''
+    
     
 
 def draw_zones(zones, frame_annotation):
@@ -264,9 +264,10 @@ def main():
     
     #initialisation
     
-    #video source
+    #parse arguments
     args = parse.parser()
 
+    #input argument 
     if args.input:
         if args.input == "0":
             input_video = 0
@@ -274,10 +275,18 @@ def main():
             input_video = 1
         else:
             input_video = args.input
-
     else:
         input_video = cf.VIDEO_SOURCE
 
+    #config argument
+    if args.config:
+        if args.config in cf.dC.configs:
+            cf.ACTIVE_CONFIG_SET = args.config
+            cf.dC = DetectionConfig(args.config)
+        else:
+            print("Config not found, using {}".format(cf.ACTIVE_CONFIG_SET))
+
+    print("Config: {}".format(cf.ACTIVE_CONFIG_SET))
 
 
     if(input_video==0)|(input_video==1):
@@ -445,12 +454,17 @@ def main():
                         tl.update_persons_zones(persons, VideoSource.nb_frame, zones)
                         t['a_update_zones'] = time.time()	
 
-                        diseppeared = tl.search_for_diseppeared_persons(persons, VideoSource)
+                    	t['disappear'] = time.time()
+                        diseppeared = [] #tl.search_for_diseppeared_persons(persons, VideoSource)
                         #print("disepeared {}".format(len(diseppeared)))
+                        t['a_disappear'] = time.time()
+
+
+                    	t['add_new_zones'] = time.time()
                         if len(diseppeared) > 0:
                             for p in diseppeared:
                                 zones.add_new_zone(p[0], p[1])
-                    
+                    	t['a_add_new_zones'] = time.time()
         
             '''
             '
@@ -512,8 +526,10 @@ def main():
         heatmap = tl.heatMap(persons, VideoSource)   
         t_a_heat_map = time.time()
         cv2.imwrite('heatmap.png', heatmap)
+    	print('Heat map done')
+
+    	cv2.imshow("Heat map", heatmap)
         while True:
-            cv2.imshow("Heat map", heatmap)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break   
 
@@ -567,7 +583,7 @@ def main():
     
     print("--------------------------")
     print("Zones")
-    
+    print("{} detection zones".format(len(zones.masks)))
     for m in zones.masks:
         print("{} in {} out {}".format(m[0].title(), zones.count["entries"][m[0]], zones.count["exits"][m[0]]))
 
@@ -591,6 +607,8 @@ def main():
     tot['draw_zones'] = 0
     tot['draw_persons'] = 0
     tot['imshow'] = 0
+    tot['disappear'] = 0
+    tot['add_new_zones'] = 0
 
     for t in timer:
 
@@ -630,6 +648,14 @@ def main():
 
         if 'imshow' in t:
             tot['imshow'] += t['a_imshow'] - t['imshow']
+
+        if 'disappear' in t:
+            tot['disappear'] += t['a_disappear'] - t['disappear']
+
+    	if 'add_new_zones' in t:
+            tot['add_new_zones'] += t['a_add_new_zones'] - t['add_new_zones']
+
+
 
     for t in tot:
         #t = float(t)/float(VideoSource.nb_frame)

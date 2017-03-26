@@ -7,8 +7,8 @@ class DetectionConfig(object):
         self.configs = {}
 
         self.configs['chute'] = {
-                'width': 960,
-                'height': 540,
+                'width': 720,
+                'height': 480,
                 'CNT_MIN': 30,
                 'MIN_SIZE_CNT_PERS': 30,
                 'MAX_DIST_CENTER_X': 160,
@@ -80,14 +80,8 @@ class DetectionConfig(object):
         size_ratio = float(width) / float(self.activeConfigSet['width'])
         area_ratio = size_ratio ** 2
 
-        print("active config")  
-        print(self.activeConfigSet)
-
         for key in self.activeConfigSet:
             self.activeConfigSet[key] = int(self.activeConfigSet[key] * size_ratio)
-
-        print("resized config")
-        print(self.activeConfigSet)
 
     def cnt_min(self):
         return int(self.activeConfigSet['CNT_MIN'])

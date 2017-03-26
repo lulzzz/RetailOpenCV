@@ -19,11 +19,11 @@ from detection_config_settings import DetectionConfig
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute10\\cam2.avi"
 
-VIDEO_SOURCE = "..\\dataset\\street\\08\\street960.mp4"
+VIDEO_SOURCE = "..\\dataset\\street\\01\\street960.mp4"
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute22\\cam2.avi"
 
-VIDEO_SOURCE = "..\\dataset\\lego960\\08\\lego.mp4"
+#VIDEO_SOURCE = "..\\dataset\\lego960\\08\\lego.mp4"
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier Staub\\Documents\\ComputerVision_Detect_Body\\videoset\\chute16\\cam2.avi"
 
@@ -71,7 +71,7 @@ DIR_ZONES = "C:\\Users\\Olivier-Laforge\\Documents\\GitHub\\RetailOpenCV\\datase
 #DIR_ZONES = "C:\\Users\\Olivier\\Documents\\retail\\RetailOpenCV\\dataset\\zones"
 
 DIR_ZONES = "..\\dataset\\zones"
-#DIR_ZONES = "../dataset/zones"
+DIR_ZONES = "../dataset/zones"
 
 '''
 '
@@ -174,7 +174,7 @@ c_kernel=cv2.getStructuringElement(STR_ELEMENT,(FG_C_OP,FG_C_OP))
 
 #Minimum contour size for detection
 
-ACTIVE_CONFIG_SET = "lego"
+ACTIVE_CONFIG_SET = "street"
 dC = DetectionConfig(ACTIVE_CONFIG_SET)
 
 

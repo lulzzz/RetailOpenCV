@@ -71,7 +71,7 @@ DIR_ZONES = "C:\\Users\\Olivier-Laforge\\Documents\\GitHub\\RetailOpenCV\\datase
 #DIR_ZONES = "C:\\Users\\Olivier\\Documents\\retail\\RetailOpenCV\\dataset\\zones"
 
 DIR_ZONES = "..\\dataset\\zones"
-DIR_ZONES = "../dataset/zones"
+#DIR_ZONES = "../dataset/zones"
 
 '''
 '
@@ -97,7 +97,7 @@ INIT_FILE = "init.png"
 '
 '''
 
-DISPLAYED_FRAME = 5
+DISPLAYED_FRAME = 1
 DRAW_CONFIG = False
 DRAW_ZONES = True
 DRAW_PERSONS = True

@@ -39,9 +39,7 @@ class Person(object):
         #born position saves whther the item was born on the side of the frame or in the middle of it
         #0 for border zones
         #1 for the rest of the frame
-
         self.born_position = 0
-
 
         #self.zone = zones.in_zones(self.position_last_frame(nb_frame))
 

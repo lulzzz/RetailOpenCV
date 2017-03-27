@@ -213,28 +213,6 @@ def check_for_deaths(zones, persons, new_size, nb_frame, backup):
             
     #print('{} persons: {} alive {} dead ({} dead backup)'.format(len(persons), count_alive, count_dead, len(backup)))
 
-def search_for_diseppeared_persons(persons, VideoSource):
-    res = []
-    for p in persons:
-        #print('test {} {} {}'.format(p.last_seen_frame(), VideoSource.nb_frame -1, p.age))
-        if p.last_seen_frame() == (VideoSource.nb_frame - 1):
-            if p.age > 100:
-
-                x,y,w,h = bbox(p.liste_contours[-100][1])
-
-                cnt = []
-                points = []
-                points.append([x,y])
-                points.append([x+w,y])
-                points.append([x+w,y+h])
-                points.append([x,y+h])
-
-                for point in points:
-                    cnt.append([point])
-
-                res.append(([np.array(cnt)], p.puuid))        
-    return res
-
 def update_persons_zones(persons, nb_frame, zones):
     for p in persons:
         if p.alive:
@@ -299,6 +277,27 @@ def update_persons_zones(persons, nb_frame, zones):
     self.zone = new_zone
     '''
 
+def search_for_diseppeared_persons(persons, VideoSource):
+    res = []
+    for p in persons:
+        #print('test {} {} {}'.format(p.last_seen_frame(), VideoSource.nb_frame -1, p.age))
+        if p.last_seen_frame() == (VideoSource.nb_frame - 1):
+            if p.age > 100:
+
+                x,y,w,h = bbox(p.liste_contours[-100][1])
+
+                cnt = []
+                points = []
+                points.append([x,y])
+                points.append([x+w,y])
+                points.append([x+w,y+h])
+                points.append([x,y+h])
+
+                for point in points:
+                    cnt.append([point])
+
+                res.append(([np.array(cnt)], p.puuid))        
+    return res
 
 def hsv_to_bgr(h,s,v):
     c = v * s

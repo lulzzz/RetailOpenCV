@@ -257,9 +257,8 @@ def draw_init_frame(VideoSource, frame, init_file):
 
 def main():
     raw_input("Press enter to begin...")
-               
 
-    #cv2.setUseOptimized(True)
+    cv2.setUseOptimized(True)
     print("Start time {}".format(tl.time()))
     
     #initialisation
@@ -340,6 +339,10 @@ def main():
     while (True):
 
         t = {}
+        t['frame'] = time.time()
+        t['frame_number'] = VideoSource.nb_frame
+        t['alive'] = len(persons)
+        t['backup'] = len(backup_dead_persons)
 
         t['next_frame'] = time.time()
 
@@ -452,9 +455,9 @@ def main():
 
                         t['update_zones'] = time.time()
                         tl.update_persons_zones(persons, VideoSource.nb_frame, zones)
-                        t['a_update_zones'] = time.time()	
+                        t['a_update_zones'] = time.time()
 
-                    	t['disappear'] = time.time()
+                        t['disappear'] = time.time()
                         diseppeared = [] #tl.search_for_diseppeared_persons(persons, VideoSource)
                         #print("disepeared {}".format(len(diseppeared)))
                         t['a_disappear'] = time.time()
@@ -465,10 +468,25 @@ def main():
                             for p in diseppeared:
                                 zones.add_new_zone(p[0], p[1])
                     	t['a_add_new_zones'] = time.time()
+
+                        if VideoSource.nb_frame == 201:
+                            x,y,w,h = tl.bbox(persons[0].liste_contours[-1][1])
+                            print("{} {} {} {}".format(x,y,w,h))
+                            cv2.imwrite("1.png", frame[ y:y+h, x:x+w])
+
+                        if VideoSource.nb_frame == 202:
+                            x,y,w,h = tl.bbox(persons[0].liste_contours[-1][1])
+                            print("{} {} {} {}".format(x,y,w,h))
+                            cv2.imwrite("2.png", frame[ y:y+h, x:x+w])
+
+                        if VideoSource.nb_frame == 202:
+                            x,y,w,h = tl.bbox(persons[1].liste_contours[-1][1])
+                            print("{} {} {} {}".format(x,y,w,h))
+                            cv2.imwrite("3.png", frame[ y:y+h, x:x+w])
         
             '''
             '
-            '   DRAWING
+            '   DRAWING     
             '
             '''
             if VideoSource.nb_frame % cf.DISPLAYED_FRAME == 0:
@@ -510,6 +528,7 @@ def main():
             cv2.imshow('Tracking',frame_annotation)
             t['a_imshow'] = time.time()
 
+        t['a_frame'] = time.time()
         timer.append(t)         
 
     t_end = time.time()
@@ -593,8 +612,12 @@ def main():
     
     print("Performances")
 
+    perf = open("log.js", "w")
+    perf_line = []
+    perf_line.append("log=[")
 
     tot = {}
+    tot['frame'] = 0
     tot['next_frame'] = 0
     tot['foreground'] = 0
     tot['draw_annotation'] = 0
@@ -610,28 +633,46 @@ def main():
     tot['disappear'] = 0
     tot['add_new_zones'] = 0
 
-    for t in timer:
+    for i,t in enumerate(timer):
 
+        t_frame = 0
+        t_next_frame = 0
+        t_foreground = 0
+        t_check_deaths = 0
+        t_find_contours = 0
+        t_search_persons_on_frame = 0
+        t_update_persons = 0
+
+        
+        if 'frame' in t:
+            t_frame = t['a_frame'] - t['frame']
+            tot['frame'] += t_frame
 
         if 'next_frame' in t:
-            tot['next_frame'] += t['a_next_frame'] - t['next_frame']
+            t_next_frame = t['a_next_frame'] - t['next_frame']
+            tot['next_frame'] += t_next_frame
 
         if 'foreground' in t:
-            tot['foreground'] += (t['a_foreground'] - t['foreground'])
+            t_foreground = t['a_foreground'] - t['foreground']
+            tot['foreground'] += t_foreground
 
         if 'draw_annotation' in t:
             tot['draw_annotation'] += t['a_draw_annotation'] - t['draw_annotation']
 
         if 'check_for_deaths' in t:
+            t_check_deaths = t['a_check_for_deaths'] - t['check_for_deaths']
             tot['check_for_deaths'] += t['a_check_for_deaths'] - t['check_for_deaths']
 
         if 'find_contours' in t:
-            tot['find_contours'] += t['a_find_contours'] - t['find_contours']
+            t_find_contours = t['a_find_contours'] - t['find_contours']
+            tot['find_contours'] += t_find_contours
 
         if 'search_persons_on_frame' in t:
+            t_search_persons_on_frame = t['a_search_persons_on_frame'] - t['search_persons_on_frame']
             tot['search_persons_on_frame'] += t['a_search_persons_on_frame'] - t['search_persons_on_frame']
 
         if 'update_persons' in t:
+            t_update_persons = t['a_update_persons'] - t['update_persons']
             tot['update_persons'] += t['a_update_persons'] - t['update_persons']
 
         if 'update_zones' in t:
@@ -652,10 +693,24 @@ def main():
         if 'disappear' in t:
             tot['disappear'] += t['a_disappear'] - t['disappear']
 
-    	if 'add_new_zones' in t:
+        if 'add_new_zones' in t:
             tot['add_new_zones'] += t['a_add_new_zones'] - t['add_new_zones']
 
 
+        if i==len(timer):
+            perf_line.append("[{},{},{},{},{},{},{},{},{},{}]".format(t['frame_number'], t['alive'], t['backup'],t_frame,t_next_frame,t_foreground,t_check_deaths,t_find_contours,t_search_persons_on_frame,t_update_persons))
+        else:
+            perf_line.append("[{},{},{},{},{},{},{},{},{},{}],".format(t['frame_number'], t['alive'], t['backup'],t_frame,t_next_frame,t_foreground,t_check_deaths,t_find_contours,t_search_persons_on_frame,t_update_persons))
+
+
+
+    perf_line.append("]")
+
+    for l in perf_line:
+        perf.write(l)
+
+    perf.close()
+        
 
     for t in tot:
         #t = float(t)/float(VideoSource.nb_frame)

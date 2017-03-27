@@ -1,0 +1,81 @@
+<html>
+	<head>
+		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+		<script type="text/javascript" src="log.js"></script>
+    	<script type="text/javascript">
+
+			google.charts.load('current', {'packages':['line', 'corechart']});
+
+			google.charts.setOnLoadCallback(drawChart);
+
+
+
+			 function drawChart() {
+
+				var button = document.getElementById('change-chart');
+				var chartDiv = document.getElementById('chart_div');
+
+				var data = new google.visualization.DataTable();
+				data.addColumn('number', 'Frame number');
+				data.addColumn('number', "Number of alive objects");
+				data.addColumn('number', "Number of backuped objects");
+				data.addColumn('number', "Frame");
+				data.addColumn('number', "Next Frame");
+				data.addColumn('number', "Foreground Extraction");
+				data.addColumn('number', "Check for deaths");
+				data.addColumn('number', "Find Contours");
+				data.addColumn('number', "Search Persons");
+				data.addColumn('number', "Update Persons");
+
+				data.addRows(log);
+
+				var materialOptions = {
+				chart: {
+				  title: 'Performances Summary'
+				},
+				width: 1200,
+				height: 500,
+				series: {
+				  // Gives each series an axis name that matches the Y-axis below.
+				  0: {axis: 'Number'},
+				  1: {axis: 'Number'},
+				  2: {axis: 'Time'}, 
+				  3: {axis: 'Time'},
+				  4: {axis: 'Time'},
+				  5: {axis: 'Time'},
+				  6: {axis: 'Time'},
+				  7: {axis: 'Time'},
+				  8: {axis: 'Time'},
+				  9: {axis: 'Time'}
+
+				},
+				axes: {
+				  // Adds labels to each axis; they don't have to match the axis names.
+				  y: {
+				    Number: {label: 'Number of items'},
+				    Time: {label: 'Duration (ms)', scaleType:'log'}
+				  }
+				}
+				};
+
+				function drawMaterialChart() {
+			        var materialChart = new google.charts.Line(chartDiv);
+			        materialChart.draw(data, materialOptions);
+		      	}
+
+		      	drawMaterialChart();
+	      	}
+
+
+		</script>
+    </head>
+
+
+    <body>
+
+		<div style="width:1200px; margin-left: auto; margin-right: auto" id="chart_div"></div>
+
+
+
+ 	</body>
+</html>

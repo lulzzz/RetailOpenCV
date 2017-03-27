@@ -39,6 +39,9 @@
     <Compile Include="detection_config_settings.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="features.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ForgroundExtraction.py">
       <SubType>Code</SubType>
     </Compile>

@@ -97,7 +97,6 @@ def distance(pt1, pt2):
 
 
 def search_person_on_frame(contours):
-       
     res_temp = []
     ref = copy(contours[0])
     temp = copy(contours)
@@ -424,7 +423,7 @@ def heatMap(persons, VideoSource):
     HEAT_DATA_FILE.write(json_data)
 
     HEAT_CSS_FILE = open("heatmap.css", "w")
-    HEAT_CSS_FILE.write("#heatmap{}width:{}px; height:{}px;margin-left:auto; margin-right:auto; background-image:url('out.png'){}".format("{",VideoSource.new_size[0], VideoSource.new_size[1],"}"))
+    HEAT_CSS_FILE.write("#heatmap{}width:{}px; height:{}px;margin-left:auto; margin-right:auto; background-image:url('avg.png'){}".format("{",VideoSource.new_size[0], VideoSource.new_size[1],"}"))
 
 
     return frame

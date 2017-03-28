@@ -471,22 +471,14 @@ def main():
                                 zones.add_new_zone(p[0], p[1])
                     	t['a_add_new_zones'] = time.time()
 
-                        if VideoSource.nb_frame == 201:
-                            x,y,w,h = tl.bbox(persons[0].liste_contours[-1][1])
-                            cv2.imwrite("1.png", frame[ y:y+h, x:x+w])
+                        '''
+                        if (VideoSource.nb_frame > 200) & (VideoSource.nb_frame <= 300):
+                            for j,p in enumerate(persons):
+                                 x,y,w,h = tl.bbox(p.liste_contours[-1][1])
+                                 cv2.imwrite("exports\\img_"+str(VideoSource.nb_frame)+"_"+str(j)+".png", frame[ y:y+h, x:x+w])
 
-                        if VideoSource.nb_frame == 201:
-                            x,y,w,h = tl.bbox(persons[0].liste_contours[-1][1])
-                            cv2.imwrite("100.png", frame)
+                        '''
 
-                        if VideoSource.nb_frame == 202:
-                            x,y,w,h = tl.bbox(persons[0].liste_contours[-1][1])
-                            cv2.imwrite("2.png", frame[ y:y+h, x:x+w])
-
-                        if VideoSource.nb_frame == 202:
-                            x,y,w,h = tl.bbox(persons[1].liste_contours[-1][1])
-                            cv2.imwrite("3.png", frame[ y:y+h, x:x+w])
-        
             '''
             '
             '   DRAWING     
@@ -554,7 +546,8 @@ def main():
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break   
 
-    
+    #draw avg frame
+    cv2.imwrite('avg.png', VideoSource.avg_frame)
 
     #clean stop the thread sending the data
     sendingDataThread.stop()

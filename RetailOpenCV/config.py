@@ -23,7 +23,7 @@ VIDEO_SOURCE = "..\\dataset\\street\\01\\street960.mp4"
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute22\\cam2.avi"
 
-VIDEO_SOURCE = "..\\dataset\\lego960\\08\\lego.mp4"
+#VIDEO_SOURCE = "..\\dataset\\lego960\\08\\lego.mp4"
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier Staub\\Documents\\ComputerVision_Detect_Body\\videoset\\chute16\\cam2.avi"
 
@@ -174,7 +174,7 @@ c_kernel=cv2.getStructuringElement(STR_ELEMENT,(FG_C_OP,FG_C_OP))
 
 #Minimum contour size for detection
 
-ACTIVE_CONFIG_SET = "lego"
+ACTIVE_CONFIG_SET = "street"
 dC = DetectionConfig(ACTIVE_CONFIG_SET)
 
 

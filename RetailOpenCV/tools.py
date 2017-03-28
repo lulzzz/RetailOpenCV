@@ -423,6 +423,9 @@ def heatMap(persons, VideoSource):
     json_data = json.dumps(heat_data)
     HEAT_DATA_FILE.write(json_data)
 
+    HEAT_CSS_FILE = open("heatmap.css", "w")
+    HEAT_CSS_FILE.write("#heatmap{}width:{}px; height:{}px;margin-left:auto; margin-right:auto; background-image:url('out.png'){}".format("{",VideoSource.new_size[0], VideoSource.new_size[1],"}"))
+
 
     return frame
 

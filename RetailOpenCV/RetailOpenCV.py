@@ -512,7 +512,6 @@ def main():
                     draw_persons(persons, VideoSource, frame_annotation, frame_annotation)
                 t['a_draw_persons'] = time.time()
 
-
         else:
             draw_init_frame(VideoSource, frame_annotation, init_file)
 
@@ -548,7 +547,7 @@ def main():
         heatmap = tl.heatMap(persons, VideoSource)   
         t_a_heat_map = time.time()
         cv2.imwrite('heatmap.png', heatmap)
-    	print('Heat map done')
+        print('Heat map done')
 
     	cv2.imshow("Heat map", heatmap)
         while True:

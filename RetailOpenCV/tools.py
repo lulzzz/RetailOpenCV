@@ -13,7 +13,7 @@ import json
 import requests
 #from numba import jit
 import math
-
+import json
 
 def xmax(cnt):
     return tuple(cnt[cnt[:,:,0].argmax()][0])[0] 
@@ -371,11 +371,13 @@ def heatMap(persons, VideoSource):
     '''
 
     nb_pos_per_spot = np.zeros((int(VideoSource.new_size[1])/cf.HEAT_MAP_CELL_SIZE, int(VideoSource.new_size[0])/cf.HEAT_MAP_CELL_SIZE), np.uint8)
-    
+    nb_persons_per_position = np.zeros((int(VideoSource.new_size[1]), int(VideoSource.new_size[0])), np.uint8)
+
     for p in persons:
         for pos, nb_frame in p.liste_positions:
             nb_pos_per_spot[pos[1]/cf.HEAT_MAP_CELL_SIZE, pos[0]/cf.HEAT_MAP_CELL_SIZE] += 1
-    
+            nb_persons_per_position[pos[1], pos[0]] += 1
+   
     max = np.amax(nb_pos_per_spot)
     min = np.amin(nb_pos_per_spot)
     
@@ -403,11 +405,30 @@ def heatMap(persons, VideoSource):
             cv2.addWeighted(image, alpha, frame[y*cf.HEAT_MAP_CELL_SIZE:y*cf.HEAT_MAP_CELL_SIZE+cf.HEAT_MAP_CELL_SIZE, x*cf.HEAT_MAP_CELL_SIZE:x*cf.HEAT_MAP_CELL_SIZE+cf.HEAT_MAP_CELL_SIZE], 1 - alpha, 0, frame[y*cf.HEAT_MAP_CELL_SIZE:y*cf.HEAT_MAP_CELL_SIZE+cf.HEAT_MAP_CELL_SIZE, x*cf.HEAT_MAP_CELL_SIZE:x*cf.HEAT_MAP_CELL_SIZE+cf.HEAT_MAP_CELL_SIZE])
             #cv2.putText(frame, "{}".format(nb_pos_per_spot[y,x]), (x*20, y*20+20), cf.FONT, 0.5 , (255,255,255), 1, cv2.CV_AA)
             #frame[x*20:x*20+20, y*20:y*20+20]
+    
+    HEAT_DATA_FILE = open("heat_data.js", "w")
+    heat_data = {}
+    heat_data["max"] = int(np.amax(nb_persons_per_position))
+    heat_data["data"] = []
+    for y in range(nb_persons_per_position.shape[0]):
+        for x in range(nb_persons_per_position.shape[1]):
+            if nb_persons_per_position[y,x] != 0:
+                temp = {}
+                temp["x"] = x
+                temp["y"] = y
+                temp["value"] = int(nb_persons_per_position[y,x])
+                heat_data["data"].append(temp)
+
+    HEAT_DATA_FILE.write("data=")
+    json_data = json.dumps(heat_data)
+    HEAT_DATA_FILE.write(json_data)
+
 
     return frame
 
     
 
     
+
 
 

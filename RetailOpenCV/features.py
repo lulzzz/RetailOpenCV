@@ -129,7 +129,7 @@ def draw_matches(img1, kp1, img2, kp2, matches, color=None):
 
 
 img1 = cv2.imread("1.png", 0)
-img2 = cv2.imread("3.png", 0)
+img2 = cv2.imread("100.png", 0)
 
 orb  = cv2.ORB()
 

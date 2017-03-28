@@ -97,7 +97,7 @@ INIT_FILE = "init.png"
 '
 '''
 
-DISPLAYED_FRAME = 1
+DISPLAYED_FRAME = 5
 DRAW_CONFIG = False
 DRAW_ZONES = True
 DRAW_PERSONS = True

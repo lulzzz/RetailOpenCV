@@ -67,7 +67,9 @@ class SendDataThread(threading.Thread):
                 temp['timestamp'] = p[3]
 
                 data['logs'].append(temp)
-            
+
+            send_json = json.dumps(data)
+            cf.OUTPUTFILE.write("\n"+send_json)
             if cf.SEND_DATA:
                 print("API debug {} sending {} items".format(cf.API_DEBUG, len(cf.to_be_sent)))
                 if (self.post_results(data)):
@@ -471,17 +473,18 @@ def main():
 
                         if VideoSource.nb_frame == 201:
                             x,y,w,h = tl.bbox(persons[0].liste_contours[-1][1])
-                            print("{} {} {} {}".format(x,y,w,h))
                             cv2.imwrite("1.png", frame[ y:y+h, x:x+w])
+
+                        if VideoSource.nb_frame == 201:
+                            x,y,w,h = tl.bbox(persons[0].liste_contours[-1][1])
+                            cv2.imwrite("100.png", frame)
 
                         if VideoSource.nb_frame == 202:
                             x,y,w,h = tl.bbox(persons[0].liste_contours[-1][1])
-                            print("{} {} {} {}".format(x,y,w,h))
                             cv2.imwrite("2.png", frame[ y:y+h, x:x+w])
 
                         if VideoSource.nb_frame == 202:
                             x,y,w,h = tl.bbox(persons[1].liste_contours[-1][1])
-                            print("{} {} {} {}".format(x,y,w,h))
                             cv2.imwrite("3.png", frame[ y:y+h, x:x+w])
         
             '''

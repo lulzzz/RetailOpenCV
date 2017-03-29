@@ -107,7 +107,7 @@ class Source(object):
             width = int(cf.MAX_LONGER_SIDE  * width / height)
             height = cf.MAX_LONGER_SIDE
 
-        return width, height
+        return int(width), int(height)
         
 
     def resize(self, frame):

@@ -173,7 +173,7 @@ def update_persons(persons, nb_frame, persons_on_frame):
         for p in persons:
             if p.alive:
                 for i,pf in enumerate(working_temp_p_on_frame):
-                    if bbox_overlap(bbox(pf), bbox(p.liste_contours[-1][1])):
+                    if bbox_overlap(bbox(pf), bbox(p.data[-1][1])):
                         p.update(nb_frame, pf)
                         working_temp_p_on_frame.pop(i)
         for pf in working_temp_p_on_frame:
@@ -220,7 +220,7 @@ def update_persons_zones(persons, nb_frame, zones):
                 previous_zone = p.last_zone()
                 previous_zone_id = p.last_zone_id()
 
-                new_zone, new_zone_id = zones.in_zones(p.position_last_frame(nb_frame))
+                new_zone, new_zone_id = zones.in_zones(p.position_last_frame())
 
                 if previous_zone == 0:
                     p.add_zone(new_zone, nb_frame, new_zone_id)
@@ -370,12 +370,10 @@ def heatMap(persons, VideoSource):
     '''
 
     nb_pos_per_spot = np.zeros((int(VideoSource.new_size[1])/cf.HEAT_MAP_CELL_SIZE, int(VideoSource.new_size[0])/cf.HEAT_MAP_CELL_SIZE), np.uint8)
-    nb_persons_per_position = np.zeros((int(VideoSource.new_size[1]), int(VideoSource.new_size[0])), np.uint8)
 
     for p in persons:
-        for pos, nb_frame in p.liste_positions:
+        for pos in [p[2] for p in p.data]:
             nb_pos_per_spot[pos[1]/cf.HEAT_MAP_CELL_SIZE, pos[0]/cf.HEAT_MAP_CELL_SIZE] += 1
-            nb_persons_per_position[pos[1], pos[0]] += 1
    
     max = np.amax(nb_pos_per_spot)
     min = np.amin(nb_pos_per_spot)
@@ -404,6 +402,14 @@ def heatMap(persons, VideoSource):
             cv2.addWeighted(image, alpha, frame[y*cf.HEAT_MAP_CELL_SIZE:y*cf.HEAT_MAP_CELL_SIZE+cf.HEAT_MAP_CELL_SIZE, x*cf.HEAT_MAP_CELL_SIZE:x*cf.HEAT_MAP_CELL_SIZE+cf.HEAT_MAP_CELL_SIZE], 1 - alpha, 0, frame[y*cf.HEAT_MAP_CELL_SIZE:y*cf.HEAT_MAP_CELL_SIZE+cf.HEAT_MAP_CELL_SIZE, x*cf.HEAT_MAP_CELL_SIZE:x*cf.HEAT_MAP_CELL_SIZE+cf.HEAT_MAP_CELL_SIZE])
             #cv2.putText(frame, "{}".format(nb_pos_per_spot[y,x]), (x*20, y*20+20), cf.FONT, 0.5 , (255,255,255), 1, cv2.CV_AA)
             #frame[x*20:x*20+20, y*20:y*20+20]
+    return frame
+
+def heatMapJS(persons, VideoSource):
+    nb_persons_per_position = np.zeros((int(VideoSource.new_size[1]), int(VideoSource.new_size[0])), np.uint8)
+
+    for p in persons:
+        for pos in [p[2] for p in p.data]:
+            nb_persons_per_position[pos[1], pos[0]] += 1
     
     HEAT_DATA_FILE = open("heat_data.js", "w")
     heat_data = {}
@@ -424,13 +430,6 @@ def heatMap(persons, VideoSource):
 
     HEAT_CSS_FILE = open("heatmap.css", "w")
     HEAT_CSS_FILE.write("#heatmap{}width:{}px; height:{}px;margin-left:auto; margin-right:auto; background-image:url('avg.png'){}".format("{",VideoSource.new_size[0], VideoSource.new_size[1],"}"))
-
-
-    return frame
-
-    
-
-    
 
 
 

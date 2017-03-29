@@ -191,15 +191,16 @@ def draw_persons(persons, VideoSource, frame_annotation, frame_annotation_copy):
             cv2.putText(frame_annotation, per.puuid, (x,y), cf.FONT, 0.4, per.couleur, 1, cv2.CV_AA)
                             
             #draw current person's position on the frame
-            cv2.circle(frame_annotation, per.position_last_frame(VideoSource.nb_frame), 3, per.couleur, -1, cv2.CV_AA)
+            cv2.circle(frame_annotation, per.position_last_frame(), 3, per.couleur, -1, cv2.CV_AA)
             
             if cf.DRAW_PERSON_PATH_TAIL:
                 previous_pos = (0,0)
             
-                for i,p in enumerate(per.liste_positions[-cf.DRAW_PERSON_PATH_TAIL_LENGTH:]):
+                #for i,p in enumerate(per.liste_positions[-cf.DRAW_PERSON_PATH_TAIL_LENGTH:]):
+                for i,p in enumerate([d[2] for d in per.data[-cf.DRAW_PERSON_PATH_TAIL_LENGTH:]]):
                     if (i>0):
-                        cv2.line(frame_annotation, previous_pos, p[0], per.couleur, 2, cv2.CV_AA)
-                    previous_pos = p[0]
+                        cv2.line(frame_annotation, previous_pos, p, per.couleur, 2, cv2.CV_AA)
+                    previous_pos = p
                
 def generate_border(VideoSource, logo,  persons, backup, zones, name_source):
     temp = np.ones((48,int(VideoSource.new_size[0]), 3), np.uint8)
@@ -458,7 +459,7 @@ def main():
                         t['update_zones'] = time.time()
                         tl.update_persons_zones(persons, VideoSource.nb_frame, zones)
                         t['a_update_zones'] = time.time()
-
+                        
                         t['disappear'] = time.time()
                         diseppeared = [] #tl.search_for_diseppeared_persons(persons, VideoSource)
                         #print("disepeared {}".format(len(diseppeared)))
@@ -476,7 +477,6 @@ def main():
                             for j,p in enumerate(persons):
                                  x,y,w,h = tl.bbox(p.liste_contours[-1][1])
                                  cv2.imwrite("exports\\img_"+str(VideoSource.nb_frame)+"_"+str(j)+".png", frame[ y:y+h, x:x+w])
-
                         '''
 
             '''
@@ -534,7 +534,7 @@ def main():
 
     #process and display heat map
     if cf.DRAW_HEAT_MAP:
-        print("Processing heat map")
+        print("Processing heat map...")
         t_heat_map = time.time()
         heatmap = tl.heatMap(persons, VideoSource)   
         t_a_heat_map = time.time()
@@ -545,6 +545,13 @@ def main():
         while True:
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break   
+
+    if cf.EXPORT_HEATMAPJS_DATA:
+        print("Exporting heatmap data...")
+        t_heatmapjs_data = time.time()
+        tl.heatMapJS(persons, VideoSource)
+        t_a_heatmapjs_data = time.time()
+        print("Export heatmapJS data done")
 
     #draw avg frame
     cv2.imwrite('avg.png', VideoSource.avg_frame)
@@ -569,12 +576,10 @@ def main():
     print("Summary")
     #data = {'persons':[]}
 
-
-
     print("{} Frames".format(VideoSource.nb_frame))
     print("{} s".format(round(t_end - cf.T_START, 2)))
     print("{} AVG FPS".format(float(VideoSource.nb_frame)/(t_end-cf.T_START)))
-    print("{} ms/frame".format(round(((time.time()-cf.T_START)*1000)/float(VideoSource.nb_frame), 2)))
+    print("{} ms/frame".format(round(((t_end-cf.T_START)*1000)/float(VideoSource.nb_frame), 2)))
     print("--------------------------")
 
     print("Persons")
@@ -601,7 +606,6 @@ def main():
     for m in zones.masks:
         print("{} in {} out {}".format(m[0].title(), zones.count["entries"][m[0]], zones.count["exits"][m[0]]))
 
-    
     
     print("--------------------------")
     
@@ -713,6 +717,9 @@ def main():
 
     if cf.DRAW_HEAT_MAP:
         print("heat_map: {}ms".format(t_a_heat_map-t_heat_map))
+
+    if cf.EXPORT_HEATMAPJS_DATA:
+        print("heatmapJS_data: {}ms".format(t_a_heatmapjs_data - t_heatmapjs_data))
     
     print("--------------------------")
     

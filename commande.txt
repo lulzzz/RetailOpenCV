@@ -1,0 +1,24 @@
+CREATE POS
+
+opencv_createsamples -img img.png
+-bg bg.txt
+-info info.lst
+-pngoutput info
+-maxxangle 0.8
+-maxyangle 0.8
+-maxzangle 0.8
+-num 10
+
+
+CREATE VEC
+opencv_createsamples -info .\info\info.lst -num 8000 -w 30 -h 30 -vec pos.vec
+
+
+
+TRAIN
+C:\OPENCV\opencv_training.exe 
+-data data -vec .\positives.vec -bg bg.txt 
+-numPos 8000 -numNeg -4000 -numStages 12 
+-w 60 -h 40 
+-precalcValBufSize 4096 -precalcIdxBufSize 4096
+-minHitRate 0.999

@@ -1,0 +1,1 @@
+python RetailOpenCV.py -i ..\dataset\lego960\01\lego.mp4

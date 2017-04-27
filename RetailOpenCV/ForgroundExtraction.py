@@ -18,6 +18,9 @@ class ForgroundExtraction(object):
 
         self.frame_dim = frame_dim
 
+        self.o_kernel = cf.o_kernel
+        self.c_kernel = cf.c_kernel
+
         if (self._algo == 0):
             self.fgbg_m1 = cv2.BackgroundSubtractorMOG()  
             self.fgbg = cv2.BackgroundSubtractorMOG2(0, 20, False)   
@@ -33,21 +36,21 @@ class ForgroundExtraction(object):
             if self.nb_frame < cf.TRAIN_FRAMES:
                 self.fgmask_m1 = self.fgbg_m1.apply(frame, learningRate = cf.LR)  
                 self.fgmask = self.fgbg.apply(frame, learningRate = cf.LR)   
-                self.fgmask_m1 = cv2.morphologyEx(self.fgmask_m1, cv2.MORPH_OPEN, cf.o_kernel)
-                self.fgmask_m1 = cv2.morphologyEx(self.fgmask_m1, cv2.MORPH_CLOSE, cf.c_kernel,iterations=1)
+                self.fgmask_m1 = cv2.morphologyEx(self.fgmask_m1, cv2.MORPH_OPEN, self.o_kernel)
+                self.fgmask_m1 = cv2.morphologyEx(self.fgmask_m1, cv2.MORPH_CLOSE, self.c_kernel, iterations=1)
                 self.nb_frame += 1  
                 return self.fgmask_m1
             else:
                 self.fgmask = self.fgbg.apply(frame, learningRate = cf.LR)   
-                self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_OPEN, cf.o_kernel)
-                self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_CLOSE, cf.c_kernel,iterations=1)
+                self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_OPEN, self.o_kernel)
+                self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_CLOSE, self.c_kernel,iterations=1)
                 self.nb_frame += 1  
                 return self.fgmask
         elif (self._algo == 1)|(self._algo == 2):
             self.fgmask = self.fgbg.apply(frame, learningRate = cf.LR)   
-            self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_OPEN, cf.o_kernel, iterations=2)
-            self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_CLOSE, cf.c_kernel,iterations=2)
-            self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_OPEN, cf.o_kernel, iterations=2)
+            self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_OPEN, self.o_kernel, iterations=2)
+            self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_CLOSE, self.c_kernel,iterations=2)
+            self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_OPEN, self.o_kernel, iterations=2)
 
             #self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_OPEN, cf.o_kernel, iterations=2)
             #self.fgmask = cv2.morphologyEx(self.fgmask, cv2.MORPH_CLOSE, cf.c_kernel,iterations=1)

@@ -9,7 +9,7 @@ from detection_config_settings import DetectionConfig
 
 '''
 '
-'  VIDEO SOURCE
+'  VIDEO AQUISITION
 '
 '''
 
@@ -19,15 +19,23 @@ from detection_config_settings import DetectionConfig
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute10\\cam2.avi"
 
-VIDEO_SOURCE = "..\\dataset\\street\\01\\street960.mp4"
+
+
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier-Laforge\\Documents\\DatasetRetail\\chutes\\chute22\\cam2.avi"
 
-#VIDEO_SOURCE = "..\\dataset\\lego960\\08\\lego.mp4"
+#VIDEO_SOURCE = "..\\dataset\\lego960\\05\\lego.mp4"
+
+#VIDEO_SOURCE = "..\\dataset\\chutes\\chute14\\cam2.avi"
+
+
 
 #VIDEO_SOURCE = "C:\\Users\\Olivier Staub\\Documents\\ComputerVision_Detect_Body\\videoset\\chute16\\cam2.avi"
 
 #VIDEO_SOURCE = 1
+
+#VIDEO_SOURCE = "rtsp://admin:Azemlk123@192.168.1.31/play2.sdp"
+
 
 #VIDEO_SOURCE="C:\\Users\\Olivier Staub\\Pictures\\Camera Roll\\WIN_20170314_17_59_20_Pro.mp4"
 
@@ -52,8 +60,26 @@ VIDEO_SOURCE = "..\\dataset\\street\\01\\street960.mp4"
 #VIDEO_SOURCE = "/Users/Olivier/GitHub/Retail/chute/01/cam8.avi"
 #VIDEO_SOURCE = "/Users/Olivier/GitHub/Retail/footage/cafet2.mp4"
 
+
+
+VIDEO_SOURCE = "..\\dataset\\street\\08\\street960.mp4"
+#VIDEO_SOURCE = "..\\dataset\\chutesLab\\03\\10.avi"
+
+
+MAX_LONGER_SIDE = 960
+
 SET_WEBCAM_WIDTH = 960
 SET_WEBCAM_HEIGHT = 540
+
+ACTIVE_CONFIG_SET = "street"
+dC = DetectionConfig(ACTIVE_CONFIG_SET)
+
+
+
+#foreground extraction
+ALGO = 2
+LR = 0.002
+TRAIN_FRAMES = 80
 
 
 
@@ -70,7 +96,7 @@ DIR_ZONES = "C:\\Users\\Olivier-Laforge\\Documents\\GitHub\\RetailOpenCV\\datase
 
 #DIR_ZONES = "C:\\Users\\Olivier\\Documents\\retail\\RetailOpenCV\\dataset\\zones"
 
-DIR_ZONES = "..\\dataset\\zones"
+DIR_ZONES = "..\dataset\zones"
 #DIR_ZONES = "../dataset/zones"
 
 '''
@@ -80,15 +106,33 @@ DIR_ZONES = "..\\dataset\\zones"
 
 '''
 
+USE_SENDING_THREAD = False
 SEND_DATA = False
 API_GET_CAM_ID = ""
 API_POST_RESULTS = "http://hub-cargo.azurewebsites.net/api/hublog/notify"
 API_DEBUG = True
-API_SLEEP_TIME = 5
+API_SLEEP_TIME = 5 #in seconds, can be a float
 
 
-LOGO_FILE = "logo.png"
-INIT_FILE = "init.png"
+
+
+'''
+'
+'  PROCESSING CONFIG
+'
+'''
+
+#tracking
+TRACKING_VERBOSE = False
+
+
+#zones detection
+ZONES_DETECTION = True
+ZONES_DETECTION_VERBOSE = True
+
+#grouping
+USE_GROUPS = True
+REFRESH_POSITION_IN_GROUP = 6
 
 
 '''
@@ -97,16 +141,33 @@ INIT_FILE = "init.png"
 '
 '''
 
-DISPLAYED_FRAME = 5
-DRAW_CONFIG = False
-DRAW_ZONES = True
-DRAW_PERSONS = True
-DRAW_PERSON_PATH_TAIL = True
-DRAW_PERSON_PATH_TAIL_LENGTH = 200
+DISPLAYED_FRAME = 1
 
-DRAW_HEAT_MAP = True
+DRAW_CONFIG = False
+
+DRAW_ZONES_DETECTION = False
+DRAW_ZONES_IO = False
+DRAW_ZONES_PORTAL = False
+
+DRAW_PERSONS = True
+DRAW_PERSONS_WAITING = True
+DRAW_GROUPS = True
+DRAW_PERSON_PATH_TAIL = True
+DRAW_PERSON_PATH_TAIL_LENGTH = 500
+
+DRAW_HEAT_MAP = False
 HEAT_MAP_CELL_SIZE = 10
-EXPORT_HEATMAPJS_DATA = True
+EXPORT_HEATMAPJS_DATA = False
+
+SHOW_FG = False
+
+PLAYBACK_LENGTH = 750
+
+
+LOGO_FILE = "logo.png"
+INIT_FILE = "init.png"
+
+
 
 '''
 '
@@ -121,6 +182,8 @@ OUTPUTFILE = open("out.json", "w")
 RENDER_VIDEO = False
 def OUTPUT_VIDEO(sourceName):
     return "out_{}.avi".format(sourceName)
+
+PERF_STATS = False
 
 
 #donnee generales partagees
@@ -146,37 +209,28 @@ def get_camera_id():
 
 CAMERA_ID = get_camera_id()
 
-#Aquisition
-
-MAX_LONGER_SIDE = 960
 
 #Filled at init source in order to determine limits and min/max sizes
 CURRENT_FRAME_SIZE = 0
 
 
-#Forground Extraction Config
-
-ALGO = 2
-LR = 0.001
-
-TRAIN_FRAMES = 200
-
-
 # Operateurs morphologiques
 
-FG_O_OP=3    #10 #opening
-FG_C_OP=5    #15 #closing
+FG_O_OP = 2    #10 #opening
+FG_C_OP = 4    #15 #closing
 
-STR_ELEMENT=cv2.MORPH_ELLIPSE
+#chutelab
+FG_O_OP = 1    #10 #opening
+FG_C_OP = 5    #15 #closing
 
-o_kernel=cv2.getStructuringElement(STR_ELEMENT,(FG_O_OP,FG_O_OP))
-c_kernel=cv2.getStructuringElement(STR_ELEMENT,(FG_C_OP,FG_C_OP))  
+
+STR_ELEMENT = cv2.MORPH_ELLIPSE
+
+o_kernel = cv2.getStructuringElement(STR_ELEMENT,(FG_O_OP,FG_O_OP))
+c_kernel = cv2.getStructuringElement(STR_ELEMENT,(FG_C_OP,FG_C_OP))  
 
 
 #Minimum contour size for detection
-
-ACTIVE_CONFIG_SET = "street"
-dC = DetectionConfig(ACTIVE_CONFIG_SET)
 
 
 
@@ -187,6 +241,22 @@ NO_SEE_FRAMES_BEFORE_DEATH = 150
 NO_SEE_FRAMES_BEFORE_DEATH_BORDERS = 5
 
 ALPHA = 0.5
+
+
+'''
+'
+'  HISTOGRAMS
+'
+'''
+
+ql = 32
+channels = [0,1,2]
+ranges = [0, 256, 0, 256, 0, 256]
+histsize = [ql for i in range(0,3)]
+hist_lr = 0.6 
+
+REFRESH_HIST = 6
+
 
 '''
 MAX_DIST_CENTRE = 180

@@ -19,6 +19,19 @@ class DetectionConfig(object):
                 'MIN_PERS_SIZE_Y': 50 
             }
 
+        self.configs['chuteLab'] = {
+                'width': 720,
+                'height': 480,
+                'CNT_MIN': 30,
+                'MIN_SIZE_CNT_PERS': 30,
+                'MAX_DIST_CENTER_X': 250,
+                'MAX_DIST_CENTER_Y': 200,
+                'MAX_PERS_SIZE_X': 350,  
+                'MAX_PERS_SIZE_Y': 280,
+                'MIN_PERS_SIZE_X': 15,
+                'MIN_PERS_SIZE_Y': 20 
+            }
+
         self.configs['lego'] = {
                 'width': 960,
                 'height': 540,
@@ -83,29 +96,37 @@ class DetectionConfig(object):
         for key in self.activeConfigSet:
             self.activeConfigSet[key] = int(self.activeConfigSet[key] * size_ratio)
 
+    @property
     def cnt_min(self):
         return int(self.activeConfigSet['CNT_MIN'])
 
+    @property
     def min_size_cnt_pers(self):
         return int(self.activeConfigSet["MIN_SIZE_CNT_PERS"])
 
+    @property
     def max_dist_center_x(self):
         return int(self.activeConfigSet['MAX_DIST_CENTER_X'])
     
+    @property
     def max_dist_center_y(self):
         return int(self.activeConfigSet['MAX_DIST_CENTER_Y'])
     
+    @property
     def max_pers_size_x(self):
         return int(self.activeConfigSet['MAX_PERS_SIZE_X'])
 
+    @property
     def max_pers_size_y(self):
         return int(self.activeConfigSet['MAX_PERS_SIZE_Y'])
 
+    @property
     def min_pers_size_x(self):
         return int(self.activeConfigSet['MIN_PERS_SIZE_X'])
 
+    @property
     def min_pers_size_y(self):    
-        return int(self.activeConfigSet['MIN_PERS_SIZE_X'])
+        return int(self.activeConfigSet['MIN_PERS_SIZE_Y'])
 
 
 

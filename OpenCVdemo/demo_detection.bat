@@ -1,0 +1,2 @@
+python demo_detection.py
+exit

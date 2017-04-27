@@ -5,6 +5,7 @@ import random
 from datetime import datetime
 import time
 from copy import copy
+import os
 
 class Source(object):
 
@@ -12,9 +13,19 @@ class Source(object):
 
 
 
-    def __init__(self, path, display_frame_number=True, display_frame_dim=True):
+    def __init__(self, path, display_frame_number=True, display_frame_dim=True, name_source=None):
         self.path = path
         self.nb_frame = 0
+
+
+        if name_source == None:
+            if(path==0)|(path==1):
+                self.name_source = "Webcam"
+            else:
+                self.name_source = os.path.basename(path).split('.')[0]
+        else:
+            self.name_source = name_source
+        
 
         self.display_frame_number = display_frame_number
         self.display_frame_dim = display_frame_dim
@@ -24,11 +35,7 @@ class Source(object):
 
         print("Original size: {} x {}".format(self.camera.get(3), self.camera.get(4)))
 
-        if (path == 0):
-            self.camera.set(3, cf.SET_WEBCAM_WIDTH)
-            self.camera.set(4, cf.SET_WEBCAM_HEIGHT)
-
-        if (path == 1):
+        if (path == 0)|(path==1):
             self.camera.set(3, cf.SET_WEBCAM_WIDTH)
             self.camera.set(4, cf.SET_WEBCAM_HEIGHT)
             
@@ -49,11 +56,20 @@ class Source(object):
 
         self.nb_total_frame = 0
         if (path != 0) & (path != 1):
-            self.nb_total_frame = self.camera.get(7)
+            if self.camera.get(7) > 0:
+                self.nb_total_frame = self.camera.get(7)
 
     def next_frame(self):
         (ret, frame) = self.camera.read()
-        if ret:
+
+        #if ((self.path == 0) | (self.path == 1)) & ret == False:
+        if ret == False:
+            for i in range (10):
+                (ret, frame) = self.camera.read()
+                if ret:
+                    break
+            
+        else:
             self.nb_frame += 1
 
             if (self.original_size != self.new_size):
@@ -76,6 +92,11 @@ class Source(object):
 
             if self.nb_frame == self.nb_total_frame - 1:
                 cv2.imwrite('avg.png', self.avg_frame)
+
+            if self.name_source == "lab":
+                cv2.rectangle(frame, (0,0), (500, 30), (0,0,0), -1)
+
+            self.current_frame = frame
 
         return ret,frame
 

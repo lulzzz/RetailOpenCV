@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26315.0
+VisualStudioVersion = 15.0.26323.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "RetailOpenCV", "RetailOpenCV\RetailOpenCV.pyproj", "{CC3327A3-47AC-4B63-B9B8-C613C47E7DE8}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Tools", "Tools\Tools.pyproj", "{EB08EF4B-C08B-4B0A-9388-7119B836A831}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +15,8 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{CC3327A3-47AC-4B63-B9B8-C613C47E7DE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CC3327A3-47AC-4B63-B9B8-C613C47E7DE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB08EF4B-C08B-4B0A-9388-7119B836A831}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB08EF4B-C08B-4B0A-9388-7119B836A831}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

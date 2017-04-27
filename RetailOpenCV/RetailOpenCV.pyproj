@@ -39,16 +39,25 @@
     <Compile Include="detection_config_settings.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Dual.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="features.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ForgroundExtraction.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Group.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="gui.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="arg_parser.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="machine_learning.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Person.py">

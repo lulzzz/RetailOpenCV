@@ -1,0 +1,36 @@
+Detection application in Python 
+
+Needs:
+Python 2.7.12
+OpenCV 2.4.13
+Numpy 1.9.2
+
+*********
+Installation
+*********
+
+Install Python
+Add C:\Python27 and C:\Python27\Scripts to the variable environment path
+
+Install Numpy
+
+Extract OpenCV by cliquing on it
+Copy cv2.pyd from opencv\build\python\2.7\x86 folder to C:\Python27\Lib\site-packages
+Copy opencv_ffmpeg.dll from opencv\sources\3rdparty\ffmpeg to C:\Python27 and rename it in opencv_ffmpeg2413.dll
+
+Open the command line and execute:
+> python -m pip install requests
+
+
+*********
+Check installation
+*********
+Launch IDLE and type the following code in Python terminal:
+>> import cv2
+>> print cv2.__version__
+>> import numpy
+>> print numpy.__version__
+>>> import requests
+>>> requests.__version__
+
+If the results are printed without error, Python and the modules have been installed successfully

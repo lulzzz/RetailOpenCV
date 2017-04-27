@@ -1,0 +1,1 @@
+python RetailOpenCV.py -i ..\dataset\street\01\

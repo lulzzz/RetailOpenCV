@@ -1,11 +1,2 @@
 *.avi
-dataset/chutes/chute16/cam2_left.png
-dataset/lego
-dataset/street/01/street.mp4
-dataset/street/02/street.mp4
-dataset/street/03/street.mp4
-dataset/street/04/street.mp4
-dataset/street/08/street.mp4
-dataset/street/05/street.mp4
-dataset/street/06/street.mp4
-dataset/street/07/street.mp4
+dataset

@@ -16,6 +16,8 @@ import math
 import json
 import uuid
 import time as ti
+import fileinput
+
 
 
 def xmax(cnt):
@@ -80,10 +82,18 @@ def center_contour(cnt):
 
 
 def bbox(liste_contours):
-    x_min = min([xmin(c) for c in liste_contours])
-    x_max = max([xmax(c) for c in liste_contours])
-    y_min = min([ymin(c) for c in liste_contours])
-    y_max = max([ymax(c) for c in liste_contours])
+    
+    process = [(xmin(c), xmax(c), ymin(c), ymax(c)) for c in liste_contours]
+    #print process
+    #print min(process, key=lambda c1:c1[0])[0]
+    #x_min, x_max, y_min, y_max = min(process[0], key=lambda c1:c1[0]), max(process[:][1]), min(process[:][2]), max(process[:][3])
+    #x_min, x_max, y_min, y_max = [min(c1), max(c2), min(c3), max(c4) in c1, c2]
+    x_min, x_max, y_min, y_max = min(process, key=lambda c1:c1[0])[0], max(process, key=lambda c1:c1[1])[1], min(process, key=lambda c1:c1[2])[2], max(process, key=lambda c1:c1[3])[3]
+    #x_min = min([xmin(c) for c in liste_contours])
+    #x_max = max([xmax(c) for c in liste_contours])
+    #y_min = min([ymin(c) for c in liste_contours])
+    #y_max = max([ymax(c) for c in liste_contours])
+    
 
     xw = x_max - x_min
     yh = y_max - y_min
@@ -148,11 +158,16 @@ def distance(pt1, pt2):
     return int(math.sqrt(pow(pt1[0]-pt2[0], 2)+pow(pt1[1]-pt2[1], 2)))
 
 
-def calculate_position(list_contours):
+def calculate_position(list_contours):   
+    process = [(xmin(c), xmax(c), ymin(c), ymax(c)) for c in list_contours]
+    bbx_min, bbx_max, bby_min, bby_max = min(process, key=lambda c1:c1[0])[0], max(process, key=lambda c1:c1[1])[1], min(process, key=lambda c1:c1[2])[2], max(process, key=lambda c1:c1[3])[3]
+
+    '''
     bbx_min = min([xmin(c) for c in list_contours])
     bbx_max = max([xmax(c) for c in list_contours])
     bby_min = min([ymin(c) for c in list_contours])
     bby_max = max([ymax(c) for c in list_contours])
+    '''
 
     bbw = bbx_max - bbx_min
     bbh = bby_max - bby_min
@@ -222,10 +237,14 @@ def search_person_on_frame(contours):
                                     contours.pop(j)
                                     break
     
+    '''
     x_min = min([xmin(c) for c in res_temp])
     x_max = max([xmax(c) for c in res_temp])
     y_min = min([ymin(c) for c in res_temp])
     y_max = max([ymax(c) for c in res_temp])
+    '''
+    process = [(xmin(c), xmax(c), ymin(c), ymax(c)) for c in res_temp]
+    x_min, x_max, y_min, y_max = min(process, key=lambda c1:c1[0])[0], max(process, key=lambda c1:c1[1])[1], min(process, key=lambda c1:c1[2])[2], max(process, key=lambda c1:c1[3])[3]
 
     xw = x_max - x_min
     yh = y_max - y_min
@@ -455,8 +474,7 @@ def kill(zones, persons, groups, i, p, nb_frame, backup):
        
 
     backup.append(copy(p))
-    persons.pop(i)
-    
+    #persons.pop(i)
 
 def check_for_deaths(zones_detection, zones_io, persons, groups, new_size, nb_frame, backup):
     count_alive = 0
@@ -476,6 +494,11 @@ def check_for_deaths(zones_detection, zones_io, persons, groups, new_size, nb_fr
             
         elif not p.alive:
             count_dead += 1
+            persons.remove(p)
+
+    for p in persons:   
+        if not p.alive:
+            persons.remove(p)
             
     #print('{} persons: {} alive {} dead ({} dead backup)'.format(len(persons), count_alive, count_dead, len(backup)))
 
@@ -649,7 +672,7 @@ def heat_linear(min, max, val):
         return ((float(val))/(float(max)-float(min))) - float(min)
     return 0
 
-def heatMap(persons, VideoSource):
+def heatMap(persons, VideoSource, kind=None):
 
     frame = copy(VideoSource.avg_frame)
 
@@ -664,8 +687,9 @@ def heatMap(persons, VideoSource):
     nb_pos_per_spot = np.zeros((int(VideoSource.new_size[1])/cf.HEAT_MAP_CELL_SIZE, int(VideoSource.new_size[0])/cf.HEAT_MAP_CELL_SIZE), np.uint8)
 
     for p in persons:
-        for pos in [p[2] for p in p.data]:
-            nb_pos_per_spot[pos[1]/cf.HEAT_MAP_CELL_SIZE, pos[0]/cf.HEAT_MAP_CELL_SIZE] += 1
+        if ( (kind!=None)  & (float(p.nb_haar_detection(kind))/float(p.age) > 0.2) ) | (kind == None):
+            for pos in [p[2] for p in p.data]:
+                nb_pos_per_spot[pos[1]/cf.HEAT_MAP_CELL_SIZE, pos[0]/cf.HEAT_MAP_CELL_SIZE] += 1
    
     max = np.amax(nb_pos_per_spot)
     min = np.amin(nb_pos_per_spot)
@@ -729,36 +753,125 @@ def export_positives(VideoSource, persons):
                         
 
 
-def heatMapJS(persons, VideoSource):
-    nb_persons_per_position = np.zeros((int(VideoSource.new_size[1]), int(VideoSource.new_size[0])), np.uint8)
-
+def count_number_item_per_pos(persons, VideoSource, kind=None):
+    nb_persons = np.zeros((int(VideoSource.new_size[1]), int(VideoSource.new_size[0])), np.uint8)
     for p in persons:
-        for pos in [p[2] for p in p.data]:
-            nb_persons_per_position[pos[1], pos[0]] += 1
+        if ( (kind!=None)  & (float(p.nb_haar_detection(kind))/float(p.age) > 0.2) ) | (kind == None):
+            for pos in [p[2] for p in p.data]:
+                nb_persons[pos[1], pos[0]] += 1
+    return nb_persons
     
-    HEAT_DATA_FILE = open("heat_data.js", "w")
-    heat_data = {}
-    heat_data["max"] = int(np.amax(nb_persons_per_position))
-    heat_data["data"] = []
-    for y in xrange(nb_persons_per_position.shape[0]):
-        for x in xrange(nb_persons_per_position.shape[1]):
-            if nb_persons_per_position[y,x] != 0:
-                temp = {}
-                temp["x"] = x
-                temp["y"] = y
-                temp["value"] = int(nb_persons_per_position[y,x])
-                heat_data["data"].append(temp)
-
-    HEAT_DATA_FILE.write("data=")
-    json_data = json.dumps(heat_data)
-    HEAT_DATA_FILE.write(json_data)
-
-    HEAT_CSS_FILE = open("heatmap.css", "w")
-    HEAT_CSS_FILE.write("#heatmap{}width:{}px; height:{}px;margin-left:auto; margin-right:auto; background-image:url('avg.png'){}".format("{",VideoSource.new_size[0], VideoSource.new_size[1],"}"))
 
 
+def heatMapJS(persons, VideoSource, haar_detector):
+    #nb_persons_per_position = np.zeros((int(VideoSource.new_size[1]), int(VideoSource.new_size[0])), np.uint8)
+
+    #for p in persons:
+    #    for pos in [p[2] for p in p.data]:
+    #        nb_persons_per_position[pos[1], pos[0]] += 1
 
 
+    data_temp = []
+    data_temp.append(('all', count_number_item_per_pos(persons, VideoSource)))
+    for detector in haar_detector:
+        data_temp.append((detector[3], count_number_item_per_pos(persons, VideoSource, detector[3])))
+    
+
+
+    with open("heat_data.js", "w") as HEAT_DATA_FILE:
+        heat_data = {}
+        for set, data_set in data_temp:
+            heat_data[set] = {}
+            heat_data[set]["max"] = int(np.amax(data_set))
+            heat_data[set]["data"] = []
+            for y in xrange(data_set.shape[0]):
+                for x in xrange(data_set.shape[1]):
+                    if data_set[y,x] != 0:
+                        temp = {}
+                        temp["x"] = x
+                        temp["y"] = y
+                        temp["value"] = int(data_set[y,x])
+                        heat_data[set]["data"].append(temp)
+
+        HEAT_DATA_FILE.write("data=")
+        HEAT_DATA_FILE.write(json.dumps(heat_data))
+
+
+    with open("heatmap_canvas.html") as HEAT_HTML_FILE:
+        html = HEAT_HTML_FILE.read()
+
+    html = html.replace("%title%", "Heatmap {}".format(VideoSource.name_source.title()))
+    html = html.replace("%radius%", "{}".format(15))
+    html = html.replace("%blur%", "{}".format(0.8))    
+    html = html.replace("%maxOpacity%", "{}".format(0.9))
+
+    sets = "<h5 id='title_all' class='title_active'>All</h5>\n"   
+    clickEvent = 'document.getElementById("title_all").onclick = function(){display_data("all")}\n'
+    liste_sets = ['all']
+
+    for detector in haar_detector:
+        sets = sets + '<h5 id="title_{}">{}</h5>\n'.format(detector[3],detector[3].title())
+        clickEvent = clickEvent + "document.getElementById('title_{}').onclick = function(){}display_data('{}'){}".format(detector[3],"{", detector[3], "}")
+        liste_sets.append(detector[3])
+
+    html = html.replace("%sets%", sets)
+    html = html.replace("%clickEventMapping%", clickEvent)
+
+
+    refreshFunction = ''
+
+    for set in liste_sets:
+        refreshFunction += "if (dataset == '{}'){}\n".format(set, "{")
+        refreshFunction += "document.getElementById('title_{}').classList.add('title_active')\n".format(set)
+        for s in liste_sets:
+            if set != s:
+                 refreshFunction += "document.getElementById('title_{}').classList.remove('title_active')\n".format(s)       
+
+        refreshFunction += "heatmapInstance.setData(data['{}']);{}\n".format(set, "}")
+
+    html = html.replace("%refreshFunction%",refreshFunction)
+    
+   
+
+    with open("heatmap_gen.html", "w") as HEAT_HTML_FILE:
+        HEAT_HTML_FILE.write(html)
+        
+
+
+    with open("heatmap.css", "w") as HEAT_CSS_FILE:
+        HEAT_CSS_FILE.write("#heatmap{}width:{}px; height:{}px;margin-left:auto; margin-right:auto; background-image:url('avg.png'){}\n".format("{",VideoSource.new_size[0], VideoSource.new_size[1],"}"))
+        HEAT_CSS_FILE.write(".titles{}width:{}px;margin-left: auto;margin-right: auto;{}\n".format("{",VideoSource.new_size[0], "}"))
+        HEAT_CSS_FILE.write(".title_active{}background-color:#c9c9c9;{}\n".format("{","}"))
+        HEAT_CSS_FILE.write("h5{}display: inline-flex;margin-right: 5px;margin-left: 5px;padding-right: 10px;padding-left: 10px;padding-top:4px;padding-bottom: 4px;{}\n".format("{","}"))
+        HEAT_CSS_FILE.write("h5:hover{}cursor: pointer;background-color: #999999;{}\n".format("{","}"))
 
 def print_perf(tot, key, nb_frame):
     print('{}: {}ms'.format(key, (float(tot[key])/nb_frame)*1000))
+
+
+def processing_haar_detection(frame, nb_frame, persons, haar_detector):
+    for i,p in enumerate(persons):
+        if p.last_seen_frame() == nb_frame:
+            x,y,w,h = p.last_bbox()
+                
+            margin = cf.HAAR_DETECTOR_MARGIN
+
+            x = x - margin if (x-margin) > 0 else 0
+            w = w + (2*margin) if (w+(2*margin)) < frame.shape[1] else frame.shape[1]-1
+            y = y - margin if (y - margin) > 0 else 0
+            h = h + (2*margin) if  (h + (2*margin))  < frame.shape[0] else frame.shape[0]-1
+
+            #cv2.rectangle(frame, (x,y), (x+w, y+h), (0,0,255))
+
+            frame_extracted = frame[y:y+h, x:x+w]
+            for detector in haar_detector:
+                if len(haar_detect(detector, frame_extracted)) > 0:
+                    p.add_haar_detection(nb_frame, detector[3])
+
+def haar_detect(haar_detector, frame):
+
+    cascade, param1, param2, kind = haar_detector
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    detection = cascade.detectMultiScale(frame, param1, param2)
+
+    return [(x,y,w,h) for x,y,w,h in detection]

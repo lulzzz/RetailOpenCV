@@ -28,7 +28,7 @@ import random
 
 def main():
 
-    VIDEO_SOURCE = "..\\dataset\\street\\05\\street960.mp4"
+    VIDEO_SOURCE = "..\\dataset\\street\\08\\street960.mp4"
 
     
     args = parse.parser()
@@ -92,6 +92,7 @@ def main():
 
 
         cv2.imshow("ML", frame)
+        print "\r{}".format(video.nb_frame),
 
 
     video.release()

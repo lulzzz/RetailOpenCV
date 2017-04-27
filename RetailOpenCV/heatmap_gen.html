@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Heatmap Street960</title>
+	<script src='http://www.patrick-wied.at/static/heatmapjs/assets/js/heatmap.min.js'></script>
+	<script type="text/javascript" src="heat_data.js"></script>
+	<link rel="stylesheet" type="text/css" href="heatmap.css">
+	<style type="text/css">
+		h2{
+			text-align: center;	
+		}
+	</style>
+</head>
+<body>
+	<h2>Heatmap Street960</h2>
+	<div class='titles'>
+		<h5 id='title_all' class='title_active'>All</h5>
+<h5 id="title_car">Car</h5>
+
+
+	</div>
+	<div id="heatmap">
+	</div>
+	<script>
+		var heatmapInstance = h337.create({
+			container: document.getElementById("heatmap"),
+			radius: 15,
+			blur: 0.8,
+			maxOpacity:0.9
+		});
+
+
+		heatmapInstance.setData(data['all']);
+		// var image = new Image();
+		// canvas = document.getElementsByClassName("heatmap-canvas");
+		// image.src = canvas.toDataURL("image/png");
+		// document.getElementByName("body").appendChild(image)
+
+		document.getElementById("title_all").onclick = function(){display_data("all")}
+document.getElementById('title_car').onclick = function(){display_data('car')}
+
+		function display_data(dataset){
+			if (dataset == 'all'){
+document.getElementById('title_all').classList.add('title_active')
+document.getElementById('title_car').classList.remove('title_active')
+heatmapInstance.setData(data['all']);}
+if (dataset == 'car'){
+document.getElementById('title_car').classList.add('title_active')
+document.getElementById('title_all').classList.remove('title_active')
+heatmapInstance.setData(data['car']);}
+
+
+		}
+
+
+	</script>
+</body>
+</html>

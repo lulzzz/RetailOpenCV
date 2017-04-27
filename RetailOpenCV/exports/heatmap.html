@@ -22,13 +22,13 @@
 	<script>
 		var heatmapInstance = h337.create({
 			container: document.getElementById("heatmap"),
-			radius: 15,
-			blur: 0.8,
+			radius: 20,
+			blur: 0.6,
 			maxOpacity:0.9
 		});
 
 
-		heatmapInstance.setData(data['all']);
+		heatmapInstance.setData(data);
 		// var image = new Image();
 		// canvas = document.getElementsByClassName("heatmap-canvas");
 		// image.src = canvas.toDataURL("image/png");
@@ -46,14 +46,14 @@
 				console.log(dataset)
 				document.getElementById('title_all').classList.add('title_active')
 				document.getElementById('title_car').classList.remove('title_active')
-				heatmapInstance.setData(data['all']);
+				heatmapInstance.setData(data);
 			}
 			if (dataset == 'car')
 			{
 				console.log(dataset)
 				document.getElementById('title_car').classList.add('title_active')
 				document.getElementById('title_all').classList.remove('title_active')
-				heatmapInstance.setData(data['car']);
+				heatmapInstance.setData(data_car);
 			}
 		}
 

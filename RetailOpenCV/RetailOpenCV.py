@@ -25,6 +25,7 @@ from detection_config_settings import DetectionConfig
 import random
 import profile
 
+
 class SendDataThread(threading.Thread):
     def __init__(self): 
         threading.Thread.__init__(self)
@@ -411,7 +412,6 @@ def main():
     else:
         print "Data sending thread desactivated"    
 
-
     timer = []
 
     #initialise the zones object
@@ -424,6 +424,11 @@ def main():
 
     logo_file = cv2.imread(cf.LOGO_FILE)
     init_file = cv2.imread(cf.INIT_FILE)
+
+
+    #initialize the haar detector
+    haar_detector = [(cv2.CascadeClassifier(name), param1, param2, kind) for name, param1, param2, kind in cf.haar_detector]
+
 
     #main loop
     print("Start training background detection")
@@ -587,7 +592,10 @@ def main():
 
                                 #when possible persons are identified on the frame, try to track them, ie associate these persons with the ones already registered
                                 t['update_persons'] = time.time()
-                                tl.update_persons_with_groups(persons, VideoSource.nb_frame, temp_persons_detected_on_current_frame, VideoSource, groups, t)
+                                if cf.USE_GROUPS:
+                                    tl.update_persons_with_groups(persons, VideoSource.nb_frame, temp_persons_detected_on_current_frame, VideoSource, groups, t)
+                                else:
+                                    tl.update_persons(persons, VideoSource.nb_frame, temp_persons_detected_on_current_frame, VideoSource, groups, t)
                                 t['a_update_persons'] = time.time()
 
 
@@ -609,10 +617,13 @@ def main():
                                         zones_detection.add_new_zone(p[0], p[1])
                                 t['a_add_new_zones'] = time.time()
                                 '''
+                                if cf.USE_GROUPS:
+                                    t['update_groups'] = time.time()
+                                    tl.update_groups(VideoSource, persons, groups)
+                                    t['a_update_groups'] = time.time()
 
-                                t['update_groups'] = time.time()
-                                tl.update_groups(VideoSource, persons, groups)
-                                t['a_update_groups'] = time.time()
+
+                                tl.processing_haar_detection(VideoSource.current_frame, VideoSource.nb_frame, persons, haar_detector)
 
                     #tl.export_positives(VideoSource, persons)
                     #tl.export_negatives(VideoSource, persons)
@@ -688,21 +699,32 @@ def main():
 
     t_end = time.time()
 
+
+
     print("Killing {} alive current items".format(len(persons)))
     for i,p in enumerate(persons):
         print("{} {} {} dies    {} age {}".format(VideoSource.nb_frame, tl.time(), p.puuid, p.last_zone(), p.age))
         tl.kill(zones_detection, persons, groups, i, p, VideoSource.nb_frame, backup_dead_persons)
+    
+    for p in persons:
+        if not p.alive:
+            persons.remove(p)
+
+    #print len(persons)
 
     #process and display heat map
     if cf.DRAW_HEAT_MAP:
         print("Processing heat map...")
         t_heat_map = time.time()
-        heatmap = tl.heatMap(persons, VideoSource)   
+        heatmap = tl.heatMap(backup_dead_persons, VideoSource)   
         t_a_heat_map = time.time()
         cv2.imwrite('heatmap.png', heatmap)
         print('Heat map done')
 
         cv2.imshow("Heat map", heatmap)
+
+        heatmap_car = tl.heatMap(backup_dead_persons, VideoSource, "car")
+        cv2.imshow('heatmap car', heatmap_car)
         while True:
             if 27 == cv2.waitKey(1):
                 break   
@@ -710,7 +732,7 @@ def main():
     if cf.EXPORT_HEATMAPJS_DATA:
         print("Exporting heatmapJS data...")
         t_heatmapjs_data = time.time()
-        tl.heatMapJS(persons, VideoSource)
+        tl.heatMapJS(backup_dead_persons, VideoSource, haar_detector)
         t_a_heatmapjs_data = time.time()
         print("Export heatmapJS data done")
         #draw avg frame
@@ -921,8 +943,6 @@ def main():
     tl.print_perf(tot, 'draw_zones', VideoSource.nb_frame)
     tl.print_perf(tot, 'draw_persons', VideoSource.nb_frame)
 
-    
-
     if cf.DRAW_HEAT_MAP:
         print("heat_map: {}ms".format(t_a_heat_map-t_heat_map))
 
@@ -931,8 +951,9 @@ def main():
     
     print("--------------------------")
 
+
     return 0
 
 if __name__ == "__main__":
-    #main()
-    profile.run('main()')
+    main()
+    #profile.run('main()')

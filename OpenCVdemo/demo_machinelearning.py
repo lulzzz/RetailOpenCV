@@ -7,7 +7,7 @@ import os
 def main():
     print "Appuyer sur la touche ECHAP pour quitter"
 
-    VIDEO_SOURCE = "dataset\\street.mp4"
+    VIDEO_SOURCE = "dataset\\street960.mp4"
 
     args = parse.parser()
     if args.input:

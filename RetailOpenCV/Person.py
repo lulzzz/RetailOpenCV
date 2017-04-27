@@ -40,6 +40,7 @@ class Person(object):
         self.hist = cv2.calcHist(cv2.split(vs.current_frame), cf.channels, self.mask, cf.histsize, cf.ranges)/cv2.countNonZero(self.mask)
         self.log = []
         self.last_position = 0,0
+        self.item_haar_detected = []
 
 
     def update(self, nb_frame, liste_contours, vs, persons):
@@ -150,10 +151,16 @@ class Person(object):
         
 
     def last_bbox(self):
+    
+        process = [(tl.xmin(c), tl.xmax(c), tl.ymin(c), tl.ymax(c)) for c in self.data[-1][1]]
+        x_min, x_max, y_min, y_max = min(process, key=lambda c1:c1[0])[0], max(process, key=lambda c1:c1[1])[1], min(process, key=lambda c1:c1[2])[2], max(process, key=lambda c1:c1[3])[3]
+
+        '''
         x_min = min([tl.xmin(c) for c in self.data[-1][1]])
         x_max = max([tl.xmax(c) for c in self.data[-1][1]])
         y_min = min([tl.ymin(c) for c in self.data[-1][1]])
         y_max = max([tl.ymax(c) for c in self.data[-1][1]])
+        '''
 
         w = x_max - x_min
         h = y_max - y_min
@@ -195,6 +202,17 @@ class Person(object):
 
     def add_event(self, nb_frame, event, zone):
         self.log.append((nb_frame, event, zone))
+
+    def add_haar_detection(self, nb_frame, kind):
+        #print "{} is a {} !".format(self.puuid, kind)
+        self.item_haar_detected.append((nb_frame, kind))
+
+    def nb_haar_detection(self, kind):
+        #return len(self.item_haar_detected)
+        #print "{} {}".format(self.puuid, len([nb_frame for nb_frame, k in self.item_haar_detected if k == kind]))
+        return len([nb_frame for nb_frame, k in self.item_haar_detected if k == kind])
+
+
 
     '''
     def close_from_borders(self,  video_dim):

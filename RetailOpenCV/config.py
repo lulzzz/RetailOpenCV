@@ -131,8 +131,13 @@ ZONES_DETECTION = True
 ZONES_DETECTION_VERBOSE = True
 
 #grouping
-USE_GROUPS = True
+USE_GROUPS = False
 REFRESH_POSITION_IN_GROUP = 6
+
+#haar detector
+HAAR_DETECTOR_MARGIN = 20
+haar_detector = []
+haar_detector.append(("cascade\\5024\\cascade_15_5024.xml", 1.5, 6, "car"))
 
 
 '''
@@ -157,7 +162,7 @@ DRAW_PERSON_PATH_TAIL_LENGTH = 500
 
 DRAW_HEAT_MAP = False
 HEAT_MAP_CELL_SIZE = 10
-EXPORT_HEATMAPJS_DATA = False
+
 
 SHOW_FG = False
 
@@ -184,6 +189,8 @@ def OUTPUT_VIDEO(sourceName):
     return "out_{}.avi".format(sourceName)
 
 PERF_STATS = False
+
+EXPORT_HEATMAPJS_DATA = True
 
 
 #donnee generales partagees

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>%title%</title>
+	<script src='http://www.patrick-wied.at/static/heatmapjs/assets/js/heatmap.min.js'></script>
+	<script type="text/javascript" src="heat_data.js"></script>
+	<link rel="stylesheet" type="text/css" href="heatmap.css">
+	<style type="text/css">
+		h2{
+			text-align: center;	
+		}
+	</style>
+</head>
+<body>
+	<h2>%title%</h2>
+	<div class='titles'>
+		%sets%
+
+	</div>
+	<div id="heatmap">
+	</div>
+	<script>
+		var heatmapInstance = h337.create({
+			container: document.getElementById("heatmap"),
+			radius: %radius%,
+			blur: %blur%,
+			maxOpacity:%maxOpacity%
+		});
+
+
+		heatmapInstance.setData(data['all']);
+		// var image = new Image();
+		// canvas = document.getElementsByClassName("heatmap-canvas");
+		// image.src = canvas.toDataURL("image/png");
+		// document.getElementByName("body").appendChild(image)
+
+		%clickEventMapping%
+
+		function display_data(dataset){
+			%refreshFunction%
+
+		}
+
+
+	</script>
+</body>
+</html>
